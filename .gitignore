@@ -1,0 +1,56 @@
+## Ignore Visual Studio temporary files, build results, and
+## user-specific files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build Folders
+bin/
+obj/
+out/
+
+## Visual Studio Code settings
+.vscode/
+
+## Rider IDE
+.idea/
+
+## NuGet packages
+*.nupkg
+packages/
+*.snupkg
+
+# Ignore .NET Core publish output folder
+publish/
+
+## Logs
+*.log
+
+## OS Generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+## DotEnv / secret files
+.env
+.env.local
+.env.*.local
+
+## Rider / JetBrains
+.idea/
+*.iml
+
+## dotnet tool files
+*.dotnet_tool.json
+
+## Coverage & test results
+TestResults/
+*.coverage
+*.coveragexml
+*.trx
+
+## User secrets
+secrets.json

@@ -1,0 +1,7 @@
+﻿@PropertyInspection.API_HostAddress = http://localhost:5110
+
+GET {{PropertyInspection.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
