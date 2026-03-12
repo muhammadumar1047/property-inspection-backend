@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PropertyInspection.Shared.Auth
 {
-    public class CreateUserDto
+    public class CreateUserRequest
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -17,3 +17,4 @@ namespace PropertyInspection.Shared.Auth
         public bool? IsAgencyAdmin { get; set; }
     }
 }
+

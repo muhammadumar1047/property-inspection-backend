@@ -12,26 +12,26 @@ namespace PropertyInspection.Application.IServices
         /// <summary>
         /// Send a notification to selected users and save recipients
         /// </summary>
-        Task SendNotificationAsync(CreateNotificationDto dto);
+        Task<PropertyInspection.Shared.ServiceResponse<bool>> SendNotificationAsync(CreateNotificationDto dto);
 
         /// <summary>
         /// Get all agencies with their users for notification selection
         /// </summary>
-        Task<IEnumerable<NotificationAgencyUserDto>> GetNotificationRecipientsAsync();
+        Task<PropertyInspection.Shared.ServiceResponse<IReadOnlyList<NotificationAgencyUserDto>>> GetNotificationRecipientsAsync();
 
         /// <summary>
         /// Get all notifications for a specific user
         /// </summary>
-        Task<List<UserNotificationDto>> GetNotifications(Guid userId);
+        Task<PropertyInspection.Shared.ServiceResponse<IReadOnlyList<UserNotificationDto>>> GetNotifications(Guid userId);
 
         /// <summary>
         /// Mark a specific notification as read
         /// </summary>
-        Task MarkAsRead(Guid notificationRecipientId);
+        Task<PropertyInspection.Shared.ServiceResponse<bool>> MarkAsRead(Guid notificationRecipientId);
 
         /// <summary>
         /// Mark all notifications as read for a user
         /// </summary>
-        Task MarkAllAsRead(Guid userId);
+        Task<PropertyInspection.Shared.ServiceResponse<bool>> MarkAllAsRead(Guid userId);
     }
 }

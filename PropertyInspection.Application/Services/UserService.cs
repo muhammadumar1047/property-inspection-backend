@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PropertyInspection.Application.IServices;
 using PropertyInspection.Core.Entities;
 using PropertyInspection.Core.Interfaces.UnitOfWork;
@@ -7,6 +7,7 @@ using PropertyInspection.Shared;
 using PropertyInspection.Shared.Auth;
 using PropertyInspection.Shared.DTOs;
 using AutoMapper;
+using PropertyInspection.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,157 +38,316 @@ namespace PropertyInspection.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<PagedResult<UserDto>> GetUsersAsync(
+        public async Task<ServiceResponse<PagedResult<UserResponse>>> GetUsersAsync(
             UserFilterDto filter,
             Guid? agencyId,
             int page = 1,
             int pageSize = 10)
         {
-            int currentPage = page < 1 ? 1 : page;
-            int skip = (currentPage - 1) * pageSize;
-
-            var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
-
-            Expression<Func<User, bool>> predicate = u =>
-                !u.IsDeleted &&
-                u.AgencyId == tenantAgencyId &&
-                (string.IsNullOrEmpty(filter.Search)
-                    || u.FirstName.Contains(filter.Search)
-                    || u.LastName.Contains(filter.Search)
-                    || u.Email.Contains(filter.Search)) &&
-                (!filter.DepartmentId.HasValue) &&
-                (!filter.IsActive.HasValue || u.IsDeleted != filter.IsActive.Value) &&
-                (!filter.RoleId.HasValue || u.UserRoles.Any(ur => ur.RoleId == filter.RoleId));
-
-            var users = await _unitOfWork.Users.GetAsync(
-                predicate: predicate,
-                include: q => q
-                    .Include(u => u.UserRoles)
-                        .ThenInclude(ur => ur.Role),
-                orderBy: q => q.OrderBy(u => u.FirstName),
-                skip: skip,
-                take: pageSize
-            );
-
-            var totalCount = await _unitOfWork.Users.CountAsync(predicate);
-
-            var userDtos = _mapper.Map<List<UserDto>>(users);
-
-            return new PagedResult<UserDto>
+            try
             {
-                Data = userDtos,
-                Page = currentPage,
-                PageSize = pageSize,
-                TotalCount = totalCount
-            };
-        }
+                int currentPage = page < 1 ? 1 : page;
+                int skip = (currentPage - 1) * pageSize;
 
-        public async Task<UserDto> GetByIdAsync(Guid id)
-        {
-            //var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
-            var user = await _unitOfWork.Users.GetByIdAsync(
-                id,
-                include: q => q
-                    .Include(u => u.Agency)
-                    .Include(u => u.UserRoles)
-                        .ThenInclude(ur => ur.Role)
-                            .ThenInclude(r => r.RolePermissions)
-                                .ThenInclude(rp => rp.Permission)
-            );
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
 
-            if (user == null)
-                throw new Exception("User not found");
+                Expression<Func<User, bool>> predicate = u =>
+                    !u.IsDeleted &&
+                    u.AgencyId == tenantAgencyId &&
+                    (string.IsNullOrEmpty(filter.Search)
+                        || u.FirstName.Contains(filter.Search)
+                        || u.LastName.Contains(filter.Search)
+                        || u.Email.Contains(filter.Search)) &&
+                    (!filter.DepartmentId.HasValue) &&
+                    (!filter.IsActive.HasValue || u.IsDeleted != filter.IsActive.Value) &&
+                    (!filter.RoleId.HasValue || u.UserRoles.Any(ur => ur.RoleId == filter.RoleId));
 
-            return _mapper.Map<UserDto>(user);
-        }
+                var users = await _unitOfWork.Users.GetAsync(
+                    predicate: predicate,
+                    include: q => q
+                        .Include(u => u.UserRoles)
+                            .ThenInclude(ur => ur.Role),
+                    orderBy: q => q.OrderBy(u => u.FirstName),
+                    skip: skip,
+                    take: pageSize
+                );
 
-        public async Task<UserDto> CreateAsync(CreateUserDto dto)
-        {
+                var totalCount = await _unitOfWork.Users.CountAsync(predicate);
 
-            var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(dto.AgencyId);
-
-            var identityUser = new ApplicationUser
-            {
-                UserName = dto.Email,
-                Email = dto.Email,
-                EmailConfirmed = true,
-                AgencyId = tenantAgencyId,
-            };
-            var identityResult = await _userAuthService.CreateUserAsync(identityUser, dto.Password);
-
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                IdentityUserId = identityUser.Id,
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                Email = dto.Email,
-                AgencyId = tenantAgencyId,
-                CreatedBy = Guid.Parse(_tenant.DomainUserId ?? ""),
-                CreatedAt = DateTime.UtcNow.Date,
-                IsAgencyAdmin = dto.IsAgencyAdmin ?? false,
-                UserRoles = dto.RoleIds.Distinct().Select(roleId => new UserRole
+                var userDtos = _mapper.Map<List<UserResponse>>(users);
+                var result = new PagedResult<UserResponse>
                 {
-                    RoleId = roleId
-                }).ToList()
-            };
+                    Data = userDtos,
+                    Page = currentPage,
+                    PageSize = pageSize,
+                    TotalCount = totalCount
+                };
 
-            await _unitOfWork.Users.AddAsync(user);
-            await _unitOfWork.CommitAsync();
-
-            return _mapper.Map<UserDto>(user);
-        }
-
-        public async Task UpdateAsync(Guid id, UpdateUserDto dto, Guid userId)
-        {
-            var user = await _unitOfWork.Users.GetByIdAsync(
-                id,
-                include: q => q.Include(u => u.UserRoles));
-
-            if (user == null)
-                throw new Exception("User not found");
-
-            user.FirstName = dto.FirstName;
-            user.LastName = dto.LastName;
-            user.UpdatedBy = userId;
-            user.UpdatedAt = DateTime.UtcNow;
-
-            user.UserRoles.Clear();
-            foreach (var roleId in dto.RoleIds.Distinct())
-            {
-                user.UserRoles.Add(new UserRole
+                return new ServiceResponse<PagedResult<UserResponse>>
                 {
-                    RoleId = roleId
-                });
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = result
+                };
             }
-
-            await _unitOfWork.CommitAsync();
+            catch
+            {
+                return new ServiceResponse<PagedResult<UserResponse>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
-        public async Task DeleteAsync(Guid id, Guid userId)
+        public async Task<ServiceResponse<UserResponse>> GetByIdAsync(Guid id)
         {
-            await _unitOfWork.Users.DeleteAsync(id, userId);
-            await _unitOfWork.CommitAsync();
+            try
+            {
+                var user = await _unitOfWork.Users.GetByIdAsync(
+                    id,
+                    include: q => q
+                        .Include(u => u.Agency)
+                        .Include(u => u.UserRoles)
+                            .ThenInclude(ur => ur.Role)
+                                .ThenInclude(r => r.RolePermissions)
+                                    .ThenInclude(rp => rp.Permission)
+                );
+
+                if (user == null)
+                {
+                    return new ServiceResponse<UserResponse>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
+
+                return new ServiceResponse<UserResponse>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = _mapper.Map<UserResponse>(user)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<UserResponse>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
-        public async Task<UserDto?> GetUserWithRolesByIdentityIdAsync(string identityUserId)
+        public async Task<ServiceResponse<UserResponse>> CreateAsync(CreateUserRequest dto)
         {
-            var user = await _unitOfWork.Users.FirstOrDefaultAsync(
-                u => u.IdentityUserId == identityUserId,
-                include: q => q
-                    .Include(u => u.Agency)
-                    .Include(u => u.UserRoles)
-                        .ThenInclude(ur => ur.Role)
-                            .ThenInclude(r => r.RolePermissions)
-                                .ThenInclude(rp => rp.Permission)
-            );
+            try
+            {
+                if (dto == null)
+                {
+                    return new ServiceResponse<UserResponse>
+                    {
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    };
+                }
 
-            if (user == null || user.IsDeleted)
-                return null;
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(dto.AgencyId);
 
-            return _mapper.Map<UserDto>(user);
+                var identityUser = new ApplicationUser
+                {
+                    UserName = dto.Email,
+                    Email = dto.Email,
+                    EmailConfirmed = true,
+                    AgencyId = tenantAgencyId,
+                };
+                var identityResult = await _userAuthService.CreateUserAsync(identityUser, dto.Password);
+                if (!identityResult.Success || identityResult.Data == null)
+                {
+                    return new ServiceResponse<UserResponse>
+                    {
+                        Success = false,
+                        Message = identityResult.Message,
+                        ErrorCode = identityResult.ErrorCode ?? ServiceErrorCodes.ServerError
+                    };
+                }
+
+                identityUser = identityResult.Data;
+
+                var user = new User
+                {
+                    Id = Guid.NewGuid(),
+                    IdentityUserId = identityUser.Id,
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName,
+                    Email = dto.Email,
+                    AgencyId = tenantAgencyId,
+                    CreatedBy = Guid.Parse(_tenant.DomainUserId ?? ""),
+                    CreatedAt = DateTime.UtcNow.Date,
+                    IsAgencyAdmin = dto.IsAgencyAdmin ?? false,
+                    UserRoles = dto.RoleIds.Distinct().Select(roleId => new UserRole
+                    {
+                        
+                        RoleId = roleId
+                    }).ToList()
+                };
+
+                await _unitOfWork.Users.AddAsync(user);
+                await _unitOfWork.CommitAsync();
+
+                return new ServiceResponse<UserResponse>
+                {
+                    Success = true,
+                    Message = "Entity created successfully",
+                    Data = _mapper.Map<UserResponse>(user)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<UserResponse>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> UpdateAsync(Guid id, UpdateUserRequest dto, Guid userId)
+        {
+            try
+            {
+                if (dto == null)
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    };
+                }
+
+                var user = await _unitOfWork.Users.GetByIdAsync(
+                    id,
+                    include: q => q.Include(u => u.UserRoles));
+
+                if (user == null)
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
+
+                user.FirstName = dto.FirstName;
+                user.LastName = dto.LastName;
+                user.UpdatedBy = userId;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                user.UserRoles.Clear();
+                foreach (var roleId in dto.RoleIds.Distinct())
+                {
+                    user.UserRoles.Add(new UserRole
+                    {
+                        RoleId = roleId
+                    });
+                }
+
+                await _unitOfWork.CommitAsync();
+
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Record updated successfully",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> DeleteAsync(Guid id, Guid userId)
+        {
+            try
+            {
+                await _unitOfWork.Users.DeleteAsync(id, userId);
+                await _unitOfWork.CommitAsync();
+
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Record deleted successfully",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<UserResponse>> GetUserWithRolesByIdentityIdAsync(string identityUserId)
+        {
+            try
+            {
+                var user = await _unitOfWork.Users.FirstOrDefaultAsync(
+                    u => u.IdentityUserId == identityUserId,
+                    include: q => q
+                        .Include(u => u.Agency)
+                        .Include(u => u.UserRoles)
+                            .ThenInclude(ur => ur.Role)
+                                .ThenInclude(r => r.RolePermissions)
+                                    .ThenInclude(rp => rp.Permission)
+                );
+
+                if (user == null || user.IsDeleted)
+                {
+                    return new ServiceResponse<UserResponse>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
+
+                return new ServiceResponse<UserResponse>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = _mapper.Map<UserResponse>(user)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<UserResponse>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
        
     }
 }
+

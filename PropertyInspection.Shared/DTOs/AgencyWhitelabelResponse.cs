@@ -1,13 +1,15 @@
 using System;
+using System.Text.Json.Serialization;
 using PropertyInspection.Core.Enums;
 
 namespace PropertyInspection.Shared.DTOs
 {
-    public class AgencyWhitelabelDto
+    public class AgencyWhitelabelResponse
     {
         public Guid Id { get; set; }
         public Guid AgencyId { get; set; }
-        public AgencyDto? Agency { get; set; }
+        [JsonIgnore]
+        public AgencyResponse? Agency { get; set; }
         public string AgencyNameColor { get; set; } = null!;
         public string AddressColor { get; set; } = null!;
         public string? AccentColor { get; set; }
@@ -20,3 +22,4 @@ namespace PropertyInspection.Shared.DTOs
         public DateTime? UpdatedAt { get; set; }
     }
 }
+

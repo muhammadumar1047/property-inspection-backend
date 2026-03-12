@@ -4,6 +4,7 @@ using PropertyInspection.Core.Entities;
 using PropertyInspection.Core.Enums;
 using PropertyInspection.Core.Interfaces.UnitOfWork;
 using PropertyInspection.Shared.DTOs;
+using PropertyInspection.Shared;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -35,57 +36,204 @@ namespace PropertyInspection.Application.Services
                        });
         }
 
-        public Task<IEnumerable<LookupDto>> GetRentFrequenciesAsync() =>
-           Task.FromResult(EnumToLookup<RentFrequency>());
-
-        public Task<IEnumerable<LookupDto>> GetPropertyTypesAsync() =>
-            Task.FromResult(EnumToLookup<PropertyType>());
-
-        public Task<IEnumerable<LookupDto>> GetInspectionStatusesAsync() =>
-            Task.FromResult(EnumToLookup<InspectionStatus>());
-
-        public Task<IEnumerable<LookupDto>> GetInspectionTypesAsync() =>
-            Task.FromResult(EnumToLookup<InspectionType>());
-
-
-        public async Task<IEnumerable<StateLookupDto>> GetStatesAsync()
+        public Task<ServiceResponse<IReadOnlyList<LookupDto>>> GetRentFrequenciesAsync()
         {
-            var states = await _unitOfWork.States.GetAsync(
-                include: q => q.Include(s => s.Country).AsNoTracking(),
-                orderBy: q => q.OrderBy(s => s.Name)
-            );
-
-            return _mapper.Map<IEnumerable<StateLookupDto>>(states);
+            try
+            {
+                var data = EnumToLookup<RentFrequency>().ToList();
+                return Task.FromResult(new ServiceResponse<IReadOnlyList<LookupDto>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = data
+                });
+            }
+            catch
+            {
+                return Task.FromResult(new ServiceResponse<IReadOnlyList<LookupDto>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                });
+            }
         }
 
-        public async Task<IEnumerable<CountryDto>> GetCountriesAsync()
+        public Task<ServiceResponse<IReadOnlyList<LookupDto>>> GetPropertyTypesAsync()
         {
-            var countries = await _unitOfWork.Countries
-                .GetAsync(orderBy: q => q.OrderBy(c => c.Name));
-
-            return _mapper.Map<IEnumerable<CountryDto>>(countries);
+            try
+            {
+                var data = EnumToLookup<PropertyType>().ToList();
+                return Task.FromResult(new ServiceResponse<IReadOnlyList<LookupDto>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = data
+                });
+            }
+            catch
+            {
+                return Task.FromResult(new ServiceResponse<IReadOnlyList<LookupDto>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                });
+            }
         }
 
-        public async Task<IEnumerable<TimeZoneLookupDto>> GetTimezonesByCountryAsync(Guid countryId)
+        public Task<ServiceResponse<IReadOnlyList<LookupDto>>> GetInspectionStatusesAsync()
         {
-            var timezones = await _unitOfWork.TimeZones
-                .GetAsync(predicate: tz => tz.CountryId == countryId,
-                          include : q => q.Include(tz => tz.Country).AsNoTracking(),
-                          orderBy: q => q.OrderBy(t => t.DisplayName));
-
-            return _mapper.Map<IEnumerable<TimeZoneLookupDto>>(timezones);
+            try
+            {
+                var data = EnumToLookup<InspectionStatus>().ToList();
+                return Task.FromResult(new ServiceResponse<IReadOnlyList<LookupDto>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = data
+                });
+            }
+            catch
+            {
+                return Task.FromResult(new ServiceResponse<IReadOnlyList<LookupDto>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                });
+            }
         }
 
-       
-        public async Task<IEnumerable<StateLookupDto>> GetStatesByCountryAsync(Guid countryId)
+        public Task<ServiceResponse<IReadOnlyList<LookupDto>>> GetInspectionTypesAsync()
         {
-            var states = await _unitOfWork.States.GetAsync(
-                predicate: s => s.CountryId == countryId,
-                include: q => q.Include(s => s.Country).AsNoTracking(),
-                orderBy: q => q.OrderBy(s => s.Name)
-            );
+            try
+            {
+                var data = EnumToLookup<InspectionType>().ToList();
+                return Task.FromResult(new ServiceResponse<IReadOnlyList<LookupDto>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = data
+                });
+            }
+            catch
+            {
+                return Task.FromResult(new ServiceResponse<IReadOnlyList<LookupDto>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                });
+            }
+        }
 
-            return _mapper.Map<IEnumerable<StateLookupDto>>(states);
+
+        public async Task<ServiceResponse<IReadOnlyList<StateLookupDto>>> GetStatesAsync()
+        {
+            try
+            {
+                var states = await _unitOfWork.States.GetAsync(
+                    include: q => q.Include(s => s.Country).AsNoTracking(),
+                    orderBy: q => q.OrderBy(s => s.Name)
+                );
+
+                return new ServiceResponse<IReadOnlyList<StateLookupDto>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = _mapper.Map<List<StateLookupDto>>(states)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<IReadOnlyList<StateLookupDto>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<IReadOnlyList<CountryDto>>> GetCountriesAsync()
+        {
+            try
+            {
+                var countries = await _unitOfWork.Countries
+                    .GetAsync(orderBy: q => q.OrderBy(c => c.Name));
+
+                return new ServiceResponse<IReadOnlyList<CountryDto>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = _mapper.Map<List<CountryDto>>(countries)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<IReadOnlyList<CountryDto>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<IReadOnlyList<TimeZoneLookupDto>>> GetTimezonesByCountryAsync(Guid countryId)
+        {
+            try
+            {
+                var timezones = await _unitOfWork.TimeZones
+                    .GetAsync(predicate: tz => tz.CountryId == countryId,
+                              include: q => q.Include(tz => tz.Country).AsNoTracking(),
+                              orderBy: q => q.OrderBy(t => t.DisplayName));
+
+                return new ServiceResponse<IReadOnlyList<TimeZoneLookupDto>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = _mapper.Map<List<TimeZoneLookupDto>>(timezones)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<IReadOnlyList<TimeZoneLookupDto>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<IReadOnlyList<StateLookupDto>>> GetStatesByCountryAsync(Guid countryId)
+        {
+            try
+            {
+                var states = await _unitOfWork.States.GetAsync(
+                    predicate: s => s.CountryId == countryId,
+                    include: q => q.Include(s => s.Country).AsNoTracking(),
+                    orderBy: q => q.OrderBy(s => s.Name)
+                );
+
+                return new ServiceResponse<IReadOnlyList<StateLookupDto>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = _mapper.Map<List<StateLookupDto>>(states)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<IReadOnlyList<StateLookupDto>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
 

@@ -19,69 +19,230 @@ namespace PropertyInspection.Infrastructure.Auth
             _userManager = userManager;
         }
 
-        public async Task<ApplicationUser> LoginAsync(string email, string password)
+        public async Task<PropertyInspection.Shared.ServiceResponse<ApplicationUser>> LoginAsync(string email, string password)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null) return null;
-
-            var result = await _signInManager.PasswordSignInAsync(user, password, false, true);
-            if (result.Succeeded) return user;
-            return null;
-        }
-
-        public async Task LogoutAsync() => await _signInManager.SignOutAsync();
-
-        public async Task<bool> VerifyMfaAsync(string userId, string token)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            return await _userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultEmailProvider, token);
-        }
-
-
-        public async Task<ApplicationUser> CreateUserAsync(ApplicationUser identityUser, string password)
-        {
-            var result = await _userManager.CreateAsync(identityUser, password);
-
-            if (!result.Succeeded)
+            try
             {
-                var errors = string.Join(", ",
-                    result.Errors.Select(e => e.Description));
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    return new PropertyInspection.Shared.ServiceResponse<ApplicationUser>
+                    {
+                        Success = false,
+                        Message = "Invalid credentials",
+                        ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.Unauthorized
+                    };
+                }
 
-                throw new Exception($"User creation failed: {errors}");
+                var result = await _signInManager.PasswordSignInAsync(user, password, false, true);
+                if (!result.Succeeded)
+                {
+                    return new PropertyInspection.Shared.ServiceResponse<ApplicationUser>
+                    {
+                        Success = false,
+                        Message = "Invalid credentials",
+                        ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.Unauthorized
+                    };
+                }
+
+                return new PropertyInspection.Shared.ServiceResponse<ApplicationUser>
+                {
+                    Success = true,
+                    Message = "Login successful",
+                    Data = user
+                };
             }
-
-            return identityUser;
-        }
-
-        public async Task<IdentityResult> UpdateUserPasswordAsync(string email, string newPassword)
-        {
-
-
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-                throw new Exception("User not found");
-
-
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-
-            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
-
-            return result;
-        }
-
-        public async Task<bool> DeleteUserAsync(ApplicationUser user)
-        {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-
-            var result = await _userManager.DeleteAsync(user);
-            if (!result.Succeeded)
+            catch
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new Exception($"User deletion failed: {errors}");
+                return new PropertyInspection.Shared.ServiceResponse<ApplicationUser>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.ServerError
+                };
             }
+        }
 
-            return true;
+        public async Task<PropertyInspection.Shared.ServiceResponse<bool>> LogoutAsync()
+        {
+            try
+            {
+                await _signInManager.SignOutAsync();
+                return new PropertyInspection.Shared.ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Logout successful",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new PropertyInspection.Shared.ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<PropertyInspection.Shared.ServiceResponse<bool>> VerifyMfaAsync(string userId, string token)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return new PropertyInspection.Shared.ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.NotFound
+                    };
+                }
+
+                var isValid = await _userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultEmailProvider, token);
+                return new PropertyInspection.Shared.ServiceResponse<bool>
+                {
+                    Success = isValid,
+                    Message = isValid ? "Verification successful" : "Invalid request data",
+                    ErrorCode = isValid ? null : PropertyInspection.Shared.ServiceErrorCodes.InvalidRequest,
+                    Data = isValid
+                };
+            }
+            catch
+            {
+                return new PropertyInspection.Shared.ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+
+        public async Task<PropertyInspection.Shared.ServiceResponse<ApplicationUser>> CreateUserAsync(ApplicationUser identityUser, string password)
+        {
+            try
+            {
+                var result = await _userManager.CreateAsync(identityUser, password);
+
+                if (!result.Succeeded)
+                {
+                    return new PropertyInspection.Shared.ServiceResponse<ApplicationUser>
+                    {
+                        Success = false,
+                        Message = "Unable to process the request at the moment",
+                        ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.ServerError
+                    };
+                }
+
+                return new PropertyInspection.Shared.ServiceResponse<ApplicationUser>
+                {
+                    Success = true,
+                    Message = "Entity created successfully",
+                    Data = identityUser
+                };
+            }
+            catch
+            {
+                return new PropertyInspection.Shared.ServiceResponse<ApplicationUser>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<PropertyInspection.Shared.ServiceResponse<bool>> UpdateUserPasswordAsync(string email, string newPassword)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    return new PropertyInspection.Shared.ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.NotFound
+                    };
+                }
+
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+                if (!result.Succeeded)
+                {
+                    return new PropertyInspection.Shared.ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Unable to process the request at the moment",
+                        ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.ServerError
+                    };
+                }
+
+                return new PropertyInspection.Shared.ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Password updated successfully",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new PropertyInspection.Shared.ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<PropertyInspection.Shared.ServiceResponse<bool>> DeleteUserAsync(ApplicationUser user)
+        {
+            try
+            {
+                if (user == null)
+                {
+                    return new PropertyInspection.Shared.ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.InvalidRequest
+                    };
+                }
+
+                var result = await _userManager.DeleteAsync(user);
+                if (!result.Succeeded)
+                {
+                    return new PropertyInspection.Shared.ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Unable to process the request at the moment",
+                        ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.ServerError
+                    };
+                }
+
+                return new PropertyInspection.Shared.ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Record deleted successfully",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new PropertyInspection.Shared.ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.ServerError
+                };
+            }
         }
     }
 }

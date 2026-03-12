@@ -18,22 +18,22 @@ namespace PropertyInspection.Application.Mapping
             CreateMap<TimeZoneLookup, TimeZoneLookupDto>();
 
             // Agency mappings
-            CreateMap<Agency, AgencyDto>();
-            CreateMap<CreateAgencyDto, Agency>()
+            CreateMap<Agency, AgencyResponse>();
+            CreateMap<CreateAgencyRequest, Agency>()
                 .ForMember(d => d.CountryId, opt => opt.MapFrom(s => s.CountryId!.Value))
                 .ForMember(d => d.StateId, opt => opt.MapFrom(s => s.StateId!.Value))
                 .ForMember(d => d.TimeZoneId, opt => opt.MapFrom(s => s.TimeZoneId!.Value));
-            CreateMap<UpdateAgencyDto, Agency>()
+            CreateMap<UpdateAgencyRequest, Agency>()
                 .ForMember(d => d.CountryId, opt => opt.MapFrom(s => s.CountryId!.Value))
                 .ForMember(d => d.StateId, opt => opt.MapFrom(s => s.StateId!.Value))
                 .ForMember(d => d.TimeZoneId, opt => opt.MapFrom(s => s.TimeZoneId!.Value));
 
             // Agency whitelabel
-            CreateMap<AgencyWhitelabel, AgencyWhitelabelDto>();
-            CreateMap<CreateAgencyWhitelabelDto, AgencyWhitelabel>()
+            CreateMap<AgencyWhitelabel, AgencyWhitelabelResponse>();
+            CreateMap<CreateAgencyWhitelabelRequest, AgencyWhitelabel>()
                 .ForMember(d => d.CreatedAt, opt => opt.Ignore())
                 .ForMember(d => d.UpdatedAt, opt => opt.Ignore());
-            CreateMap<UpdateAgencyWhitelabelDto, AgencyWhitelabel>()
+            CreateMap<UpdateAgencyWhitelabelRequest, AgencyWhitelabel>()
                 .ForMember(d => d.CreatedAt, opt => opt.Ignore())
                 .ForMember(d => d.UpdatedAt, opt => opt.Ignore());
             CreateMap<AgencyWhitelabel, WhitelabelBrandingDto>();
@@ -53,31 +53,27 @@ namespace PropertyInspection.Application.Mapping
             CreateMap<UserRole, UserRoleDto>()
                 .ForMember(d => d.Id, opt => opt.MapFrom(s => s.RoleId))
                 .ForMember(d => d.RoleName, opt => opt.MapFrom(s => s.Role != null ? s.Role.Name : string.Empty));
-            CreateMap<User, UserDto>()
+            CreateMap<User, UserResponse>()
                 .ForMember(d => d.AgencyName, opt => opt.MapFrom(s => s.Agency != null ? s.Agency.LegalBusinessName : null))
                 .ForMember(d => d.UserRoles, opt => opt.MapFrom(s => s.UserRoles));
-            CreateMap<User, UserDtoTemo>();
 
             // Property layout
-            CreateMap<PropertyLayout, PropertyLayoutDto>()
+            CreateMap<PropertyLayout, PropertyLayoutResponse>()
                 .ForMember(d => d.LayoutArea, opt => opt.MapFrom(s => s.Areas));
-            CreateMap<LayoutArea, LayoutAreaDto>()
+            CreateMap<LayoutArea, LayoutAreaResponse>()
                 .ForMember(d => d.LayoutItem, opt => opt.MapFrom(s => s.Items));
-            CreateMap<LayoutItem, LayoutItemDto>();
-            CreateMap<PropertyLayoutDto, PropertyLayout>()
-                .ForMember(d => d.Areas, opt => opt.MapFrom(s => s.LayoutArea));
-            CreateMap<LayoutAreaDto, LayoutArea>()
-                .ForMember(d => d.Items, opt => opt.MapFrom(s => s.LayoutItem));
-            CreateMap<LayoutItemDto, LayoutItem>();
+            CreateMap<LayoutItem, LayoutItemResponse>();
 
-            CreateMap<CreatePropertyLayoutDto, PropertyLayout>()
+            CreateMap<CreatePropertyLayoutRequest, PropertyLayout>()
                 .ForMember(d => d.Areas, opt => opt.MapFrom(s => s.LayoutArea));
-            CreateMap<CreateLayoutAreaDto, LayoutArea>()
+            CreateMap<UpdatePropertyLayoutRequest, PropertyLayout>()
+                .ForMember(d => d.Areas, opt => opt.MapFrom(s => s.LayoutArea));
+            CreateMap<CreateLayoutAreaRequest, LayoutArea>()
                 .ForMember(d => d.Items, opt => opt.MapFrom(s => s.LayoutItem));
-            CreateMap<CreateLayoutItemDto, LayoutItem>();
+            CreateMap<CreateLayoutItemRequest, LayoutItem>();
 
             // Property
-            CreateMap<Property, PropertyDto>()
+            CreateMap<Property, PropertyResponse>()
                 .ForMember(d => d.PropertyManagerName, opt => opt.MapFrom(s =>
                     s.PropertyManager == null
                         ? null
@@ -88,7 +84,14 @@ namespace PropertyInspection.Application.Mapping
                 .ForMember(d => d.State, opt => opt.MapFrom(s => s.State))
                 .ForMember(d => d.Landlords, opt => opt.MapFrom(s => s.Landlords))
                 .ForMember(d => d.Tenancies, opt => opt.MapFrom(s => s.Tenancies));
-            CreateMap<PropertyDto, Property>()
+            CreateMap<CreatePropertyRequest, Property>()
+                .ForMember(d => d.Agency, opt => opt.Ignore())
+                .ForMember(d => d.PropertyManager, opt => opt.Ignore())
+                .ForMember(d => d.State, opt => opt.Ignore())
+                .ForMember(d => d.PropertyLayout, opt => opt.Ignore())
+                .ForMember(d => d.Landlords, opt => opt.Ignore())
+                .ForMember(d => d.Tenancies, opt => opt.Ignore());
+            CreateMap<UpdatePropertyRequest, Property>()
                 .ForMember(d => d.Agency, opt => opt.Ignore())
                 .ForMember(d => d.PropertyManager, opt => opt.Ignore())
                 .ForMember(d => d.State, opt => opt.Ignore())
@@ -100,7 +103,7 @@ namespace PropertyInspection.Application.Mapping
             CreateMap<Tenant, TenantDto>().ReverseMap();
 
             // Inspection
-            CreateMap<Inspection, InspectionDto>()
+            CreateMap<Inspection, InspectionResponse>()
                 .ForMember(d => d.PropertyAddress, opt => opt.MapFrom(s =>
                     s.Property == null
                         ? string.Empty
@@ -115,8 +118,8 @@ namespace PropertyInspection.Application.Mapping
                 .ForMember(d => d.Property, opt => opt.MapFrom(s => s.Property))
                 .ForMember(d => d.Agency, opt => opt.MapFrom(s => s.Agency))
                 .ForMember(d => d.Inspector, opt => opt.MapFrom(s => s.Inspector));
-            CreateMap<CreateInspectionDto, Inspection>();
-            CreateMap<InspectionDto, Inspection>()
+            CreateMap<CreateInspectionRequest, Inspection>();
+            CreateMap<UpdateInspectionRequest, Inspection>()
                 .ForMember(d => d.Property, opt => opt.Ignore())
                 .ForMember(d => d.Agency, opt => opt.Ignore())
                 .ForMember(d => d.Inspector, opt => opt.Ignore())
@@ -202,3 +205,4 @@ namespace PropertyInspection.Application.Mapping
         }
     }
 }
+

@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using PropertyInspection.Core.Enums;
 
 namespace PropertyInspection.Shared.DTOs
@@ -16,7 +17,10 @@ namespace PropertyInspection.Shared.DTOs
         public DateTime? OriginalLeaseDate { get; set; }
         public DateTime? TenantVacateDate { get; set; }
         public DateTime? NewInspectionDate { get; set; }
-        public PropertyDto? Property { get; set; }
+
+        [JsonIgnore]
+        public PropertyResponse? Property { get; set; }
         public List<TenantDto> Tenants { get; set; } = new List<TenantDto>();
     }
 }
+

@@ -26,84 +26,232 @@ namespace PropertyInspection.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public Task<string> GeneratePresignedUploadUrlAsync(string folder, string fileName, string contentType)
+        public Task<ServiceResponse<string>> GeneratePresignedUploadUrlAsync(string folder, string fileName, string contentType)
         {
-            var key = $"{folder}/{Guid.NewGuid()}_{fileName}";
-
-            var request = new GetPreSignedUrlRequest
+            try
             {
-                BucketName = _bucketName,
-                Key = key,
-                Verb = HttpVerb.PUT,
-                Expires = DateTime.UtcNow.AddMinutes(10),
-                ContentType = contentType
-            };
+                if (string.IsNullOrWhiteSpace(folder) || string.IsNullOrWhiteSpace(fileName) || string.IsNullOrWhiteSpace(contentType))
+                {
+                    return Task.FromResult(new ServiceResponse<string>
+                    {
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    });
+                }
 
-            var url = _s3Client.GetPreSignedURL(request);
-            return Task.FromResult(url);
+                var key = $"{folder}/{Guid.NewGuid()}_{fileName}";
+
+                var request = new GetPreSignedUrlRequest
+                {
+                    BucketName = _bucketName,
+                    Key = key,
+                    Verb = HttpVerb.PUT,
+                    Expires = DateTime.UtcNow.AddMinutes(10),
+                    ContentType = contentType
+                };
+
+                var url = _s3Client.GetPreSignedURL(request);
+                return Task.FromResult(new ServiceResponse<string>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = url
+                });
+            }
+            catch
+            {
+                return Task.FromResult(new ServiceResponse<string>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                });
+            }
         }
 
-        public Task<string> GeneratePresignedDownloadUrlAsync(string folder, string fileName)
+        public Task<ServiceResponse<string>> GeneratePresignedDownloadUrlAsync(string folder, string fileName)
         {
-            var key = $"{folder}/{fileName}";
-
-            var request = new GetPreSignedUrlRequest
+            try
             {
-                BucketName = _bucketName,
-                Key = key,
-                Verb = HttpVerb.GET,
-                Expires = DateTime.UtcNow.AddMinutes(5)
-            };
+                if (string.IsNullOrWhiteSpace(folder) || string.IsNullOrWhiteSpace(fileName))
+                {
+                    return Task.FromResult(new ServiceResponse<string>
+                    {
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    });
+                }
 
-            var url = _s3Client.GetPreSignedURL(request);
-            return Task.FromResult(url);
+                var key = $"{folder}/{fileName}";
+
+                var request = new GetPreSignedUrlRequest
+                {
+                    BucketName = _bucketName,
+                    Key = key,
+                    Verb = HttpVerb.GET,
+                    Expires = DateTime.UtcNow.AddMinutes(5)
+                };
+
+                var url = _s3Client.GetPreSignedURL(request);
+                return Task.FromResult(new ServiceResponse<string>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = url
+                });
+            }
+            catch
+            {
+                return Task.FromResult(new ServiceResponse<string>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                });
+            }
         }
 
-        public async Task UploadFileAsync(Stream fileStream, string folder, string fileName, string contentType)
+        public async Task<ServiceResponse<bool>> UploadFileAsync(Stream fileStream, string folder, string fileName, string contentType)
         {
-            var key = $"{folder}/{fileName}";
-
-            var uploadRequest = new TransferUtilityUploadRequest
+            try
             {
-                InputStream = fileStream,
-                Key = key,
-                BucketName = _bucketName,
-                ContentType = contentType,
-                CannedACL = S3CannedACL.Private
-            };
+                if (fileStream == null || string.IsNullOrWhiteSpace(folder) || string.IsNullOrWhiteSpace(fileName) || string.IsNullOrWhiteSpace(contentType))
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    };
+                }
 
-            var transferUtility = new TransferUtility(_s3Client);
-            await transferUtility.UploadAsync(uploadRequest);
+                var key = $"{folder}/{fileName}";
+
+                var uploadRequest = new TransferUtilityUploadRequest
+                {
+                    InputStream = fileStream,
+                    Key = key,
+                    BucketName = _bucketName,
+                    ContentType = contentType,
+                    CannedACL = S3CannedACL.Private
+                };
+
+                var transferUtility = new TransferUtility(_s3Client);
+                await transferUtility.UploadAsync(uploadRequest);
+
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "File uploaded successfully",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
-        public async Task DeleteFileAsync(string folder, string fileName)
+        public async Task<ServiceResponse<bool>> DeleteFileAsync(string folder, string fileName)
         {
-            var key = $"{folder}/{fileName}";
-
-            var request = new DeleteObjectRequest
+            try
             {
-                BucketName = _bucketName,
-                Key = key
-            };
+                if (string.IsNullOrWhiteSpace(folder) || string.IsNullOrWhiteSpace(fileName))
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    };
+                }
 
-            await _s3Client.DeleteObjectAsync(request);
+                var key = $"{folder}/{fileName}";
+
+                var request = new DeleteObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = key
+                };
+
+                await _s3Client.DeleteObjectAsync(request);
+
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "File deleted successfully",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
-        public async Task<bool> FileExistsAsync(string folder, string fileName)
+        public async Task<ServiceResponse<bool>> FileExistsAsync(string folder, string fileName)
         {
+            if (string.IsNullOrWhiteSpace(folder) || string.IsNullOrWhiteSpace(fileName))
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Invalid request data",
+                    ErrorCode = ServiceErrorCodes.InvalidRequest
+                };
+            }
+
             var key = $"{folder}/{fileName}";
 
             try
             {
                 await _s3Client.GetObjectMetadataAsync(_bucketName, key);
-                return true;
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = true
+                };
             }
             catch (AmazonS3Exception ex)
             {
                 if (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    return false;
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = true,
+                        Message = "Record retrieved successfully",
+                        Data = false
+                    };
+                }
 
-                throw;
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
             }
         }   
 

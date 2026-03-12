@@ -1,26 +1,28 @@
 using PropertyInspection.Shared.DTOs;
+using PropertyInspection.Shared;
 
 namespace PropertyInspection.Application.IServices
 {
     public interface IAgencyWhitelabelService
     {
         // CRUD operations
-        Task<AgencyWhitelabelDto?> GetByAgencyIdAsync(Guid? agencyId);
-        Task<AgencyWhitelabelDto?> GetByIdAsync(Guid whitelabelId , Guid? agencyId);
-        Task<AgencyWhitelabelDto> CreateAsync(CreateAgencyWhitelabelDto createDto);
-        Task<AgencyWhitelabelDto?> UpdateAsync(Guid whitelabelId, UpdateAgencyWhitelabelDto updateDto);
-        Task<bool> DeleteAsync(Guid whitelabelId, Guid? agencyId);
+        Task<ServiceResponse<AgencyWhitelabelResponse>> GetByAgencyIdAsync(Guid? agencyId);
+        Task<ServiceResponse<AgencyWhitelabelResponse>> GetByIdAsync(Guid whitelabelId , Guid? agencyId);
+        Task<ServiceResponse<AgencyWhitelabelResponse>> CreateAsync(CreateAgencyWhitelabelRequest createDto);
+        Task<ServiceResponse<AgencyWhitelabelResponse>> UpdateAsync(Guid whitelabelId, UpdateAgencyWhitelabelRequest updateDto);
+        Task<ServiceResponse<bool>> DeleteAsync(Guid whitelabelId, Guid? agencyId);
 
         // Branding operations
-        Task<WhitelabelBrandingDto> GetBrandingAsync(Guid? agencyId);
-        Task<WhitelabelReportSettingsDto> GetReportSettingsAsync(Guid? agencyId);
-        Task<DefaultWhitelabelDto> GetDefaultBrandingAsync();
+        Task<ServiceResponse<WhitelabelBrandingDto>> GetBrandingAsync(Guid? agencyId);
+        Task<ServiceResponse<WhitelabelReportSettingsDto>> GetReportSettingsAsync(Guid? agencyId);
+        Task<ServiceResponse<DefaultWhitelabelDto>> GetDefaultBrandingAsync();
 
         // Validation operations
-        Task<bool> ExistsAsync(Guid? agencyId);
+        Task<ServiceResponse<bool>> ExistsAsync(Guid? agencyId);
 
         // Utility operations
-        Task<IEnumerable<AgencyWhitelabelDto>> GetActiveWhitelabelsAsync();
-        Task<string> SerializeContactDetailsAsync(WhitelabelContactDetailsDto contactDetails);
+        Task<ServiceResponse<IReadOnlyList<AgencyWhitelabelResponse>>> GetActiveWhitelabelsAsync();
+        Task<ServiceResponse<string>> SerializeContactDetailsAsync(WhitelabelContactDetailsDto contactDetails);
     }
 }
+

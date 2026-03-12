@@ -4,6 +4,7 @@ using PropertyInspection.Core.Entities;
 using PropertyInspection.Core.Interfaces.UnitOfWork;
 using PropertyInspection.Shared.Auth;
 using PropertyInspection.Shared.DTOs;
+using PropertyInspection.Shared;
 using AutoMapper;
 
 namespace PropertyInspection.Application.Services
@@ -19,45 +20,128 @@ namespace PropertyInspection.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<UserDto> AddUserAsync(Guid actingUserId, Guid actingAgencyId, string? role, AddAgencyUsers dto)
+        public async Task<ServiceResponse<UserResponse>> AddUserAsync(Guid actingUserId, Guid actingAgencyId, string? role, AddAgencyUsers dto)
         {
-            if (role != "Admin")
-                throw new UnauthorizedAccessException("Only Admin can add users.");
-
-            var user = new User
+            try
             {
-                Email = dto.Email
+                if (role != "Admin")
+                {
+                    return new ServiceResponse<UserResponse>
+                    {
+                        Success = false,
+                        Message = "You do not have permission to perform this action",
+                        ErrorCode = ServiceErrorCodes.Forbidden
+                    };
+                }
+
+                if (dto == null || string.IsNullOrWhiteSpace(dto.Email))
+                {
+                    return new ServiceResponse<UserResponse>
+                    {
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    };
+                }
+
+                var user = new User
+                {
+                    Email = dto.Email
+                };
+
+                await _unitOfWork.Users.AddAsync(user);
+                await _unitOfWork.CommitAsync();
+
+                return new ServiceResponse<UserResponse>
+                {
+                    Success = true,
+                    Message = "User added successfully",
+                    Data = _mapper.Map<UserResponse>(user)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<UserResponse>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<IReadOnlyList<UserResponse>>> GetUsersAsync(Guid agencyId)
+        {
+            try
+            {
+                var users = await _unitOfWork.Users.GetAsync(
+                    predicate: u => u.AgencyId == agencyId,
+                    include: q => q
+                        .Include(u => u.UserRoles)
+                            .ThenInclude(ur => ur.Role),
+                    orderBy: q => q.OrderBy(u => u.FirstName));
+
+                return new ServiceResponse<IReadOnlyList<UserResponse>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = _mapper.Map<List<UserResponse>>(users)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<IReadOnlyList<UserResponse>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> UpdateRoleAsync(Guid targetUserId, Guid actingAgencyId, string? role, UpdateRoleDto dto)
+        {
+            await Task.CompletedTask;
+            return new ServiceResponse<bool>
+            {
+                Success = false,
+                Message = "Unable to process the request at the moment",
+                ErrorCode = ServiceErrorCodes.ServerError
             };
-
-            await _unitOfWork.Users.AddAsync(user);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<UserDto>(user);
         }
 
-        public async Task<List<UserDto>> GetUsersAsync(Guid agencyId)
+        public async Task<ServiceResponse<bool>> DeleteUserAsync(Guid targetUserId, Guid actingAgencyId, string? role)
         {
-            var users = await _unitOfWork.Users.GetAsync(
-                predicate: u => u.AgencyId == agencyId,
-                include: q => q
-                    .Include(u => u.UserRoles)
-                        .ThenInclude(ur => ur.Role),
-                orderBy: q => q.OrderBy(u => u.FirstName));
-            return _mapper.Map<List<UserDto>>(users);
-        }
+            try
+            {
+                if (role != "Admin")
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "You do not have permission to perform this action",
+                        ErrorCode = ServiceErrorCodes.Forbidden
+                    };
+                }
 
-        public async Task<bool> UpdateRoleAsync(Guid targetUserId, Guid actingAgencyId, string? role, UpdateRoleDto dto)
-        {
-            await Task.CompletedTask;
-            return false;
-        }
-
-        public async Task<bool> DeleteUserAsync(Guid targetUserId, Guid actingAgencyId, string? role)
-        {
-            if (role != "Admin")
-                throw new UnauthorizedAccessException("Only Admin can delete users.");
-
-            await Task.CompletedTask;
-            return true;
+                await Task.CompletedTask;
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Record deleted successfully",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
     }
 }
+

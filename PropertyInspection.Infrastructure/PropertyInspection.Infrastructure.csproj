@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PropertyInspection.Core\PropertyInspection.Core.csproj" />
+    <ProjectReference Include="..\PropertyInspection.Shared\PropertyInspection.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

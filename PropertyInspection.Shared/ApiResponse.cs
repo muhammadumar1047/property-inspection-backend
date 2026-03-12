@@ -12,5 +12,6 @@ namespace PropertyInspection.Shared
         public string Message { get; set; } = string.Empty;
         public T Data { get; set; } = default!;
         public object? Meta { get; set; }
+        public string? ErrorCode { get; set; }
     }
 }

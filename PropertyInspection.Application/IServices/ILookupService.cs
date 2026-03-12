@@ -9,14 +9,14 @@ namespace PropertyInspection.Application.IServices
 {
     public interface ILookupService
     {
-        Task<IEnumerable<LookupDto>> GetRentFrequenciesAsync();
-        Task<IEnumerable<LookupDto>> GetPropertyTypesAsync();
-        Task<IEnumerable<LookupDto>> GetInspectionStatusesAsync();
-        Task<IEnumerable<LookupDto>> GetInspectionTypesAsync();
+        Task<PropertyInspection.Shared.ServiceResponse<IReadOnlyList<LookupDto>>> GetRentFrequenciesAsync();
+        Task<PropertyInspection.Shared.ServiceResponse<IReadOnlyList<LookupDto>>> GetPropertyTypesAsync();
+        Task<PropertyInspection.Shared.ServiceResponse<IReadOnlyList<LookupDto>>> GetInspectionStatusesAsync();
+        Task<PropertyInspection.Shared.ServiceResponse<IReadOnlyList<LookupDto>>> GetInspectionTypesAsync();
 
-        Task<IEnumerable<StateLookupDto>> GetStatesAsync();
-        Task<IEnumerable<CountryDto>> GetCountriesAsync();
-        Task<IEnumerable<TimeZoneLookupDto>> GetTimezonesByCountryAsync(Guid countryId);
-        Task<IEnumerable<StateLookupDto>> GetStatesByCountryAsync(Guid countryId);
+        Task<PropertyInspection.Shared.ServiceResponse<IReadOnlyList<StateLookupDto>>> GetStatesAsync();
+        Task<PropertyInspection.Shared.ServiceResponse<IReadOnlyList<CountryDto>>> GetCountriesAsync();
+        Task<PropertyInspection.Shared.ServiceResponse<IReadOnlyList<TimeZoneLookupDto>>> GetTimezonesByCountryAsync(Guid countryId);
+        Task<PropertyInspection.Shared.ServiceResponse<IReadOnlyList<StateLookupDto>>> GetStatesByCountryAsync(Guid countryId);
     }
 }

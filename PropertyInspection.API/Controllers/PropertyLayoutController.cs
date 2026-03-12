@@ -20,129 +20,50 @@ namespace PropertyInspection.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ApiResponse<PagedResult<PropertyLayoutDto>>>> GetAllByAgency(
+        public async Task<ActionResult<ApiResponse<PagedResult<PropertyLayoutResponse>>>> GetAllByAgency(
             Guid? agencyId,
             int pageNumber = 1,
             int pageSize = 10
         )
         {
-
-            var (layouts, totalCount) = (await _propertyLayoutService.GetAllByAgencyAsync(agencyId));
-
-            var result = new PagedResult<PropertyLayoutDto>
-            {
-                Data = layouts.ToList(),
-                Page = pageNumber,
-                PageSize = pageSize,
-                TotalCount = totalCount
-            };
-
-            return Ok(new ApiResponse<PagedResult<PropertyLayoutDto>>
-            {
-                Success = true,
-                Message = "Records retrieved successfully",
-                Data = result,
-                Meta = new { result.Data.Count }
-            });
+            var result = await _propertyLayoutService.GetAllByAgencyAsync(agencyId, pageNumber, pageSize);
+            return this.ToActionResult(result, new { Count = result.Data?.Data.Count ?? 0 });
         }
 
         [HttpGet("{layoutId}")]
-        public async Task<ActionResult<ApiResponse<PropertyLayoutDto>>> GetById(Guid layoutId , Guid? agencyId)
+        public async Task<ActionResult<ApiResponse<PropertyLayoutResponse>>> GetById(Guid layoutId , Guid? agencyId)
         {
 
-            var layout = await _propertyLayoutService.GetByIdAsync(layoutId, agencyId);
-            if (layout == null)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Record not found.",
-                    Data = false
-                });
-            }
-
-            return Ok(new ApiResponse<PropertyLayoutDto>
-            {
-                Success = true,
-                Message = "Record retrieved successfully",
-                Data = layout
-            });
+            var result = await _propertyLayoutService.GetByIdAsync(layoutId, agencyId);
+            return this.ToActionResult(result);
         }
 
         [HttpPost]
         //[Permission("propertylayout.create")]
-        public async Task<ActionResult<ApiResponse<PropertyLayoutDto>>> Create([FromBody] CreatePropertyLayoutDto layoutDto)
+        public async Task<ActionResult<ApiResponse<PropertyLayoutResponse>>> Create([FromBody] CreatePropertyLayoutRequest layoutDto)
         {
            
-            var created = await _propertyLayoutService.CreateAsync(layoutDto);
-            return CreatedAtAction(
+            var result = await _propertyLayoutService.CreateAsync(layoutDto);
+            return this.ToCreatedAtActionResult(
                 nameof(GetById),
-                new { layoutId = created.Id },
-                new ApiResponse<PropertyLayoutDto>
-                {
-                    Success = true,
-                    Message = "Entity created successfully",
-                    Data = created
-                });
+                new { layoutId = result.Data?.Id ?? Guid.Empty },
+                result);
         }
 
         [HttpPut("{layoutId}")]
-        public async Task<ActionResult<ApiResponse<bool>>> Update(Guid layoutId, [FromBody] PropertyLayoutDto layoutDto)
+        public async Task<ActionResult<ApiResponse<bool>>> Update(Guid layoutId, [FromBody] UpdatePropertyLayoutRequest layoutRequest)
         {
-           
-
-            if (layoutId != layoutDto.Id)
-            {
-                return BadRequest(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Layout ID mismatch",
-                    Data = false
-                });
-            }
-
-            try
-            {
-                await _propertyLayoutService.UpdateAsync(layoutDto);
-                return Ok(new ApiResponse<bool>
-                {
-                    Success = true,
-                    Message = "Record updated successfully",
-                    Data = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = ex.Message,
-                    Data = false
-                });
-            }
+            var result = await _propertyLayoutService.UpdateAsync(layoutId, layoutRequest);
+            return this.ToActionResult(result);
         }
 
         [HttpDelete("{layoutId}")]
         public async Task<ActionResult<ApiResponse<bool>>> Delete(Guid layoutId , Guid? agencyId)
         {
 
-            var deleted = await _propertyLayoutService.DeleteAsync(layoutId, agencyId);
-            if (!deleted)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Record not found.",
-                    Data = false
-                });
-            }
-
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Message = "Record deleted successfully",
-                Data = true
-            });
+            var result = await _propertyLayoutService.DeleteAsync(layoutId, agencyId);
+            return this.ToActionResult(result);
         }
     }
 }
+

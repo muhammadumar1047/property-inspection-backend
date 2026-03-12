@@ -6,7 +6,7 @@ namespace PropertyInspection.Application.IServices
 {
     public interface IReportTemplateService
     {
-        Task<ReportTemplateDto?> GenerateReportTemplateForPCR(Guid inspectionId);
-        Task<ReportTemplateDto?> GenerateReportTemplateForRoutine(Guid inspectionId);
+        Task<PropertyInspection.Shared.ServiceResponse<ReportTemplateDto>> GenerateReportTemplateForPCR(Guid inspectionId);
+        Task<PropertyInspection.Shared.ServiceResponse<ReportTemplateDto>> GenerateReportTemplateForRoutine(Guid inspectionId);
     }
 }

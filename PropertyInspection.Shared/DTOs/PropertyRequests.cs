@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
 using PropertyInspection.Core.Enums;
 
 namespace PropertyInspection.Shared.DTOs
 {
-    public class PropertyDto : BaseEntityDto
+    public class PropertyRequestBase
     {
         public Guid? AgencyId { get; set; }
         public string Name { get; set; } = null!;
@@ -21,14 +22,18 @@ namespace PropertyInspection.Shared.DTOs
         public string? PropertyNotes { get; set; }
         public string? PropertyImages { get; set; }
         public Guid PropertyLayoutId { get; set; }
-        public string? PropertyManagerName { get; set; }
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
-        public AgencyDto? Agency { get; set; }
-        public UserDtoTemo? PropertyManager { get; set; }
-        public StateLookupDto? State { get; set; }
-        public PropertyLayoutDto? PropertyLayout { get; set; }
         public List<LandlordDto> Landlords { get; set; } = new List<LandlordDto>();
         public List<TenancyDto> Tenancies { get; set; } = new List<TenancyDto>();
+    }
+
+    public class CreatePropertyRequest : PropertyRequestBase
+    {
+    }
+
+    public class UpdatePropertyRequest : PropertyRequestBase
+    {
+        public Guid Id { get; set; }
     }
 }

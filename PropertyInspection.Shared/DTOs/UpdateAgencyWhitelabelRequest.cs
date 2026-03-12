@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PropertyInspection.Shared.DTOs
 {
-    public class UpdateAgencyWhitelabelDto
+    public class UpdateAgencyWhitelabelRequest
     {
         public Guid? AgencyId { get; set; }
         public string AgencyNameColor { get; set; } = "#1E40AF";
@@ -21,3 +21,4 @@ namespace PropertyInspection.Shared.DTOs
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }
+

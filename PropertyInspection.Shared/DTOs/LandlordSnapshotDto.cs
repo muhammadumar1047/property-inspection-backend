@@ -10,6 +10,7 @@ namespace PropertyInspection.Shared.DTOs
         public string Email { get; set; } = null!;
         public string? Phone { get; set; }
         public string? Address { get; set; }
-        public InspectionDto? Inspection { get; set; }
+        public InspectionResponse? Inspection { get; set; }
     }
 }
+

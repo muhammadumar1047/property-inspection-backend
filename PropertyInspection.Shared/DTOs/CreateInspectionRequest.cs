@@ -1,4 +1,4 @@
-﻿using PropertyInspection.Core.Enums;
+using PropertyInspection.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PropertyInspection.Shared.DTOs
 {
-    public class CreateInspectionDto
+    public class CreateInspectionRequest
     {
         [Required]
         public Guid PropertyId { get; set; }
@@ -34,3 +34,4 @@ namespace PropertyInspection.Shared.DTOs
         public TimeSpan InspectionTime { get; set; }
     }
 }
+

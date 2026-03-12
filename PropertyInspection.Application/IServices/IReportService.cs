@@ -4,6 +4,6 @@ namespace PropertyInspection.Application.IServices
 {
     public interface IReportService
     {
-        Task<ReportDto?> GetReportByInspectionIdAsync(Guid inspectionId , Guid? agencyId);
+        Task<PropertyInspection.Shared.ServiceResponse<ReportDto>> GetReportByInspectionIdAsync(Guid inspectionId , Guid? agencyId);
     }
 }

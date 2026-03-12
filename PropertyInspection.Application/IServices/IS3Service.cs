@@ -4,10 +4,10 @@ namespace PropertyInspection.Application.IServices
 {
     public interface IS3Service
     {
-        Task<string> GeneratePresignedUploadUrlAsync(string folder, string fileName, string contentType);
-        Task<string> GeneratePresignedDownloadUrlAsync(string folder, string fileName);
-        Task UploadFileAsync(Stream fileStream, string folder, string fileName, string contentType);
-        Task DeleteFileAsync(string folder, string fileName);
-        Task<bool> FileExistsAsync(string folder, string fileName);
+        Task<PropertyInspection.Shared.ServiceResponse<string>> GeneratePresignedUploadUrlAsync(string folder, string fileName, string contentType);
+        Task<PropertyInspection.Shared.ServiceResponse<string>> GeneratePresignedDownloadUrlAsync(string folder, string fileName);
+        Task<PropertyInspection.Shared.ServiceResponse<bool>> UploadFileAsync(Stream fileStream, string folder, string fileName, string contentType);
+        Task<PropertyInspection.Shared.ServiceResponse<bool>> DeleteFileAsync(string folder, string fileName);
+        Task<PropertyInspection.Shared.ServiceResponse<bool>> FileExistsAsync(string folder, string fileName);
     }
 }

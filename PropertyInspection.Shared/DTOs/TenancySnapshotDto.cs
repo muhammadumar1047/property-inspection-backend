@@ -12,6 +12,7 @@ namespace PropertyInspection.Shared.DTOs
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public decimal RentAmount { get; set; }
-        public InspectionDto? Inspection { get; set; }
+        public InspectionResponse? Inspection { get; set; }
     }
 }
+

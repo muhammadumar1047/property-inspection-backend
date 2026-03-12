@@ -5,6 +5,7 @@ using PropertyInspection.Application.IServices.Notification.Hubs;
 using PropertyInspection.Core.Entities;
 using PropertyInspection.Core.Interfaces.UnitOfWork;
 using PropertyInspection.Shared.DTOs;
+using PropertyInspection.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,86 +29,186 @@ namespace PropertyInspection.Application.Services
             _mapper = mapper;
         }
 
-        public async Task SendNotificationAsync(CreateNotificationDto dto)
+        public async Task<ServiceResponse<bool>> SendNotificationAsync(CreateNotificationDto dto)
         {
-            var notification = _mapper.Map<Notification>(dto);
-            notification.CreatedAt = DateTime.UtcNow;
-
-            // Step 2: Save notification in DB
-            await _unitOfWork.Notifications.AddAsync(notification);
-            await _unitOfWork.CommitAsync();
-
-            // Step 3: Get users by SelectedUserIds
-            var users = await _unitOfWork.NotificationRecipients.GetAsync(
-                u => dto.UserIds.Contains(u.UserId),
-                include: q => q // optional include if you need agency/user navigation
-            );
-
-            // Step 4: Add recipients
-            var recipients = users.Select(u => new NotificationRecipient
+            try
             {
-                NotificationId = notification.Id,
-                AgencyId = u.AgencyId,
-                UserId = u.UserId,
-                IsRead = false
-            }).ToList();
-
-            // Step 5: Send SignalR notifications
-            foreach (var user in users)
-            {
-                await _hubContext.Clients.Group(user.UserId.ToString())
-                    .SendAsync("ReceiveNotification", new
+                if (dto == null || dto.UserIds == null || dto.UserIds.Count == 0)
+                {
+                    return new ServiceResponse<bool>
                     {
-                        notification.Id,
-                        notification.Title,
-                        notification.Message,
-                        notification.CreatedAt
-                    });
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    };
+                }
+
+                var notification = _mapper.Map<Notification>(dto);
+                notification.CreatedAt = DateTime.UtcNow;
+
+                await _unitOfWork.Notifications.AddAsync(notification);
+                await _unitOfWork.CommitAsync();
+
+                var users = await _unitOfWork.NotificationRecipients.GetAsync(
+                    u => dto.UserIds.Contains(u.UserId),
+                    include: q => q
+                );
+
+                var recipients = users.Select(u => new NotificationRecipient
+                {
+                    NotificationId = notification.Id,
+                    AgencyId = u.AgencyId,
+                    UserId = u.UserId,
+                    IsRead = false
+                }).ToList();
+
+                foreach (var user in users)
+                {
+                    await _hubContext.Clients.Group(user.UserId.ToString())
+                        .SendAsync("ReceiveNotification", new
+                        {
+                            notification.Id,
+                            notification.Title,
+                            notification.Message,
+                            notification.CreatedAt
+                        });
+                }
+
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Notification sent successfully",
+                    Data = true
+                };
             }
-
-            // Step 6: Save recipients
-            //await _unitOfWork.NotificationRecipients.AddAsync(recipients);
-            //await _unitOfWork.CommitAsync();
-        }
-
-        public async Task<IEnumerable<NotificationAgencyUserDto>> GetNotificationRecipientsAsync()
-        {
-            // Get all agencies with users (custom repo method)
-            return await GetAgenciesWithUsersAsync();
-        }
-
-        public async Task<List<UserNotificationDto>> GetNotifications(Guid userId)
-        {
-            var notifications = await _unitOfWork.NotificationRecipients.GetAsync(
-                r => r.UserId == userId,
-                include: q => q.Include(n => n.Notification) // Include navigation if needed
-            );
-
-            return _mapper.Map<List<UserNotificationDto>>(notifications);
-        }
-
-        public async Task MarkAsRead(Guid notificationRecipientId)
-        {
-            var recipient = await _unitOfWork.NotificationRecipients.GetByIdAsync(notificationRecipientId);
-            if (recipient != null)
+            catch
             {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<IReadOnlyList<NotificationAgencyUserDto>>> GetNotificationRecipientsAsync()
+        {
+            try
+            {
+                var recipients = await GetAgenciesWithUsersAsync();
+                return new ServiceResponse<IReadOnlyList<NotificationAgencyUserDto>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = recipients.ToList()
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<IReadOnlyList<NotificationAgencyUserDto>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<IReadOnlyList<UserNotificationDto>>> GetNotifications(Guid userId)
+        {
+            try
+            {
+                var notifications = await _unitOfWork.NotificationRecipients.GetAsync(
+                    r => r.UserId == userId,
+                    include: q => q.Include(n => n.Notification)
+                );
+
+                return new ServiceResponse<IReadOnlyList<UserNotificationDto>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = _mapper.Map<List<UserNotificationDto>>(notifications)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<IReadOnlyList<UserNotificationDto>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> MarkAsRead(Guid notificationRecipientId)
+        {
+            try
+            {
+                var recipient = await _unitOfWork.NotificationRecipients.GetByIdAsync(notificationRecipientId);
+                if (recipient == null)
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
+
                 recipient.IsRead = true;
                 await _unitOfWork.NotificationRecipients.UpdateAsync(recipient);
                 await _unitOfWork.CommitAsync();
+
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Record updated successfully",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
             }
         }
 
-        public async Task MarkAllAsRead(Guid userId)
+        public async Task<ServiceResponse<bool>> MarkAllAsRead(Guid userId)
         {
-            var recipients = await _unitOfWork.NotificationRecipients.GetAsync(r => r.UserId == userId && !r.IsRead);
-
-            foreach (var recipient in recipients)
+            try
             {
-                recipient.IsRead = true;
-                await _unitOfWork.NotificationRecipients.UpdateAsync(recipient);
-            }
+                var recipients = await _unitOfWork.NotificationRecipients.GetAsync(r => r.UserId == userId && !r.IsRead);
 
-            await _unitOfWork.CommitAsync();
+                foreach (var recipient in recipients)
+                {
+                    recipient.IsRead = true;
+                    await _unitOfWork.NotificationRecipients.UpdateAsync(recipient);
+                }
+
+                await _unitOfWork.CommitAsync();
+
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Records updated successfully",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
         private async Task<IEnumerable<NotificationAgencyUserDto>> GetAgenciesWithUsersAsync()

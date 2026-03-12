@@ -1,4 +1,4 @@
-﻿using PropertyInspection.Core.Entities;
+using PropertyInspection.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PropertyInspection.Shared.Auth
 {
-    public class UserDto : BaseEntity
+    public class UserResponse : BaseEntity
     {
         public string IdentityUserId { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
@@ -21,3 +21,4 @@ namespace PropertyInspection.Shared.Auth
         public List<UserRoleDto>? UserRoles { get; set; } = new List<UserRoleDto>();
     }
 }
+

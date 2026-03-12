@@ -18,7 +18,7 @@ namespace PropertyInspection.Application.Services
         }
 
         // Report generation with branding
-        public async Task<WhitelabelReportSettingsDto> GetReportBrandingAsync(Guid agencyId)
+        public async Task<PropertyInspection.Shared.ServiceResponse<WhitelabelReportSettingsDto>> GetReportBrandingAsync(Guid agencyId)
         {
             return await _whitelabelService.GetReportSettingsAsync(agencyId);
         }
@@ -112,8 +112,16 @@ namespace PropertyInspection.Application.Services
         // Email template with branding
         public async Task<string> GenerateEmailHeaderHtmlAsync(Guid agencyId)
         {
-            var settings = await _whitelabelService.GetReportSettingsAsync(agencyId);
-            var branding = await _whitelabelService.GetBrandingAsync(agencyId);
+            var settingsResponse = await _whitelabelService.GetReportSettingsAsync(agencyId);
+            var brandingResponse = await _whitelabelService.GetBrandingAsync(agencyId);
+
+            if (!settingsResponse.Success || !brandingResponse.Success || settingsResponse.Data == null || brandingResponse.Data == null)
+            {
+                return string.Empty;
+            }
+
+            var settings = settingsResponse.Data;
+            var branding = brandingResponse.Data;
 
             var headerHtml = new StringBuilder();
             headerHtml.AppendLine($"<div style=\"background-color: {branding.PrimaryColor}; padding: 20px; text-align: center;\">");
@@ -160,7 +168,7 @@ namespace PropertyInspection.Application.Services
         //}
 
         // UI branding
-        public async Task<WhitelabelBrandingDto> GetUIBrandingAsync(Guid agencyId)
+        public async Task<PropertyInspection.Shared.ServiceResponse<WhitelabelBrandingDto>> GetUIBrandingAsync(Guid agencyId)
         {
             return await _whitelabelService.GetBrandingAsync(agencyId);
         }

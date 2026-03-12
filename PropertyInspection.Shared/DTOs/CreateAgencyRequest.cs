@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PropertyInspection.Shared.DTOs
 {
-    public class CreateAgencyDto
+    public class CreateAgencyRequest
     {
         public string LegalBusinessName { get; set; } = string.Empty;
         public string? CompanyWebsite { get; set; }
@@ -57,3 +57,4 @@ namespace PropertyInspection.Shared.DTOs
     }
 
 }
+

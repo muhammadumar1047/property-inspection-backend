@@ -1,11 +1,12 @@
 using PropertyInspection.Core.Enums;
 using PropertyInspection.Shared.DTOs;
+using PropertyInspection.Shared;
 
 namespace PropertyInspection.Application.IServices
 {
     public interface IPropertyService
     {
-        Task<(IEnumerable<PropertyDto> Properties, int TotalCount)> GetAllByAgencyAsync(
+        Task<ServiceResponse<PagedResult<PropertyResponse>>> GetAllByAgencyAsync(
             Guid? agencyId,
             int pageNumber = 1,
             int pageSize = 10,
@@ -16,9 +17,10 @@ namespace PropertyInspection.Application.IServices
             string? suburb = null,
             bool? isActive = null);
 
-        Task<PropertyDto?> GetByIdAsync(Guid propertyId, Guid? agencyId);
-        Task<PropertyDto> CreateAsync(PropertyDto propertyDto);
-        Task<PropertyDto?> UpdateAsync(PropertyDto propertyDto);
-        Task<bool> DeletePropertyAsync(Guid propertyId, Guid? agencyId);
+        Task<ServiceResponse<PropertyResponse>> GetByIdAsync(Guid propertyId, Guid? agencyId);
+        Task<ServiceResponse<PropertyResponse>> CreateAsync(CreatePropertyRequest propertyRequest);
+        Task<ServiceResponse<bool>> UpdateAsync(Guid propertyId, UpdatePropertyRequest propertyRequest);
+        Task<ServiceResponse<bool>> DeletePropertyAsync(Guid propertyId, Guid? agencyId);
     }
 }
+

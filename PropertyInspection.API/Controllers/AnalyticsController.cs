@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PropertyInspection.API.Authorization;
+using PropertyInspection.API.Extensions;
 using PropertyInspection.Application.IServices;
 using PropertyInspection.Shared;
 using PropertyInspection.Shared.DTOs;
@@ -26,23 +27,18 @@ namespace PropertyInspection.API.Controllers
         {
             if (!HttpContext.Items.ContainsKey("AgencyId") || HttpContext.Items["AgencyId"] == null)
             {
-                return BadRequest(new ApiResponse<object>
+                return this.ToActionResult(new ServiceResponse<AnalyticsDto>
                 {
                     Success = false,
-                    Message = "AgencyId is missing.",
-                    Data = false
+                    Message = "Invalid request data",
+                    ErrorCode = ServiceErrorCodes.InvalidRequest
                 });
             }
 
             Guid agencyId = Guid.Parse(HttpContext.Items["AgencyId"]?.ToString() ?? Guid.Empty.ToString());
 
-            var analytics = await _analyticsService.GetDashboardAnalyticsByAgencyAsync(agencyId);
-            return Ok(new ApiResponse<AnalyticsDto>
-            {
-                Success = true,
-                Message = "Record retrieved successfully",
-                Data = analytics
-            });
+            var result = await _analyticsService.GetDashboardAnalyticsByAgencyAsync(agencyId);
+            return this.ToActionResult(result);
         }
     }
 }

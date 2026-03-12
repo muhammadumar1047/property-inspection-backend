@@ -1,11 +1,12 @@
 using PropertyInspection.Core.Enums;
 using PropertyInspection.Shared.DTOs;
+using PropertyInspection.Shared;
 
 namespace PropertyInspection.Application.IServices
 {
     public interface IInspectionService
     {
-        Task<(IEnumerable<InspectionDto> Inspections, int TotalCount)> GetAllInspectionsAsync(
+        Task<ServiceResponse<PagedResult<InspectionResponse>>> GetAllInspectionsAsync(
             Guid? agencyId,
             Guid inspectionId,
             int pageNumber = 1,
@@ -20,24 +21,25 @@ namespace PropertyInspection.Application.IServices
             string? searchProperty = null);
 
         // Get single inspection by Id
-        Task<InspectionDto?> GetByIdAsync(Guid inspectionId , Guid? agencyId);
+        Task<ServiceResponse<InspectionResponse>> GetByIdAsync(Guid inspectionId , Guid? agencyId);
 
         // Create new inspection
-        Task<InspectionDto> CreateAsync(CreateInspectionDto inspectionDto);
+        Task<ServiceResponse<InspectionResponse>> CreateAsync(CreateInspectionRequest inspectionDto);
 
         // Update existing inspection
-        Task<InspectionDto?> UpdateAsync(InspectionDto inspectionDto);
+        Task<ServiceResponse<bool>> UpdateAsync(Guid inspectionId, UpdateInspectionRequest inspectionRequest);
 
         // Get all inspections for a property
-        Task<List<InspectionDto>> GetAllByPropertyAsync(Guid propertyId, Guid? agencyId);
+        Task<ServiceResponse<IReadOnlyList<InspectionResponse>>> GetAllByPropertyAsync(Guid propertyId, Guid? agencyId);
 
         // Delete inspection by Id
-        Task<bool> DeleteAsync(Guid inspectionId, Guid? agencyId);
+        Task<ServiceResponse<bool>> DeleteAsync(Guid inspectionId, Guid? agencyId);
 
         // Delete landlord snapshot
-        Task<bool> DeleteLandlordSnapshotAsync(Guid landlordSnapshotId, Guid? agencyId);
+        Task<ServiceResponse<bool>> DeleteLandlordSnapshotAsync(Guid landlordSnapshotId, Guid? agencyId);
 
         // Delete tenancy snapshot
-        Task<bool> DeleteTenancySnapshotAsync(Guid tenancySnapshotId, Guid? agencyId);
+        Task<ServiceResponse<bool>> DeleteTenancySnapshotAsync(Guid tenancySnapshotId, Guid? agencyId);
     }
 }
+

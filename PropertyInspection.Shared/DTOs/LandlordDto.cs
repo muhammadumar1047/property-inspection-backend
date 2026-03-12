@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using PropertyInspection.Core.Enums;
 
 namespace PropertyInspection.Shared.DTOs
@@ -9,6 +10,8 @@ namespace PropertyInspection.Shared.DTOs
         public string Name { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string? Phone { get; set; }
-        public PropertyDto? Property { get; set; }
+        [JsonIgnore]
+        public PropertyResponse? Property { get; set; }
     }
 }
+

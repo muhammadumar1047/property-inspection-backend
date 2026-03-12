@@ -6,7 +6,7 @@ namespace PropertyInspection.Application.IServices
 {
     public interface ISearchService
     {
-        Task<SearchResultGroupedDto> SearchAsync(string query, Guid? agencyId);
-        Task<List<SearchPropertyDto>> SearchPropertyAsync(string query, Guid? agencyId);
+        Task<PropertyInspection.Shared.ServiceResponse<SearchResultGroupedDto>> SearchAsync(string query, Guid? agencyId);
+        Task<PropertyInspection.Shared.ServiceResponse<IReadOnlyList<SearchPropertyDto>>> SearchPropertyAsync(string query, Guid? agencyId);
     }
 }

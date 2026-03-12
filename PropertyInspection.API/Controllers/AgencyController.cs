@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PropertyInspection.API.Extensions;
 using PropertyInspection.Application.IServices;
 using PropertyInspection.Shared;
 using PropertyInspection.Shared.DTOs;
@@ -18,7 +19,7 @@ namespace PropertyInspection.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ApiResponse<PagedResult<AgencyDto>>>> GetAgencies(
+        public async Task<ActionResult<ApiResponse<PagedResult<AgencyResponse>>>> GetAgencies(
             [FromQuery] Guid? countryId,
             [FromQuery] Guid? stateId,
             [FromQuery] string? name,
@@ -26,159 +27,61 @@ namespace PropertyInspection.API.Controllers
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
-            var (agencies, totalCount) = await _agencyService.GetAllAsync(pageNumber, pageSize, countryId, stateId, name, suburb);
-
-            var result = new PagedResult<AgencyDto>
-            {
-                Data = agencies,
-                Page = pageNumber,
-                PageSize = pageSize,
-                TotalCount = totalCount
-            };
-
-            return Ok(new ApiResponse<PagedResult<AgencyDto>>
-            {
-                Success = true,
-                Message = "Records retrieved successfully",
-                Data = result,
-                Meta = new { Count = result.Data.Count }
-            });
+            var result = await _agencyService.GetAllAsync(pageNumber, pageSize, countryId, stateId, name, suburb);
+            return this.ToActionResult(result, new { Count = result.Data?.Data.Count ?? 0 });
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResponse<AgencyDto>>> GetAgency(Guid id)
+        public async Task<ActionResult<ApiResponse<AgencyResponse>>> GetAgency(Guid id)
         {
-            var agency = await _agencyService.GetByIdAsync(id);
-            if (agency == null)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Agency not found.",
-                    Data = false
-                });
-            }
-
-            return Ok(new ApiResponse<AgencyDto>
-            {
-                Success = true,
-                Message = "Record retrieved successfully",
-                Data = agency
-            });
+            var result = await _agencyService.GetByIdAsync(id);
+            return this.ToActionResult(result);
         }
 
         [HttpPost]
-        public async Task<ActionResult<ApiResponse<AgencyDto>>> CreateAgency([FromBody] CreateAgencyDto dto)
+        public async Task<ActionResult<ApiResponse<AgencyResponse>>> CreateAgency([FromBody] CreateAgencyRequest dto)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ApiResponse<object>
+                return this.ToActionResult(new ServiceResponse<AgencyResponse>
                 {
                     Success = false,
-                    Message = "Validation failed",
-                    Data = ModelState
+                    Message = "Invalid request data",
+                    ErrorCode = ServiceErrorCodes.InvalidRequest
                 });
             }
 
             var result = await _agencyService.CreateAsync(dto);
-            return CreatedAtAction(
+            return this.ToCreatedAtActionResult(
                 nameof(GetAgency),
-                new { id = result.Id },
-                new ApiResponse<AgencyDto>
-                {
-                    Success = true,
-                    Message = "Entity created successfully",
-                    Data = result
-                });
+                new { id = result.Data?.Id ?? Guid.Empty },
+                result);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResponse<AgencyDto>>> UpdateAgency(Guid id, [FromBody] UpdateAgencyDto dto)
+        public async Task<ActionResult<ApiResponse<AgencyResponse>>> UpdateAgency(Guid id, [FromBody] UpdateAgencyRequest dto)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ApiResponse<object>
+                return this.ToActionResult(new ServiceResponse<AgencyResponse>
                 {
                     Success = false,
-                    Message = "Validation failed",
-                    Data = ModelState
+                    Message = "Invalid request data",
+                    ErrorCode = ServiceErrorCodes.InvalidRequest
                 });
             }
 
-            try
-            {
-                var updatedAgency = await _agencyService.UpdateAsync(id, dto);
-                if (updatedAgency == null)
-                {
-                    return NotFound(new ApiResponse<object>
-                    {
-                        Success = false,
-                        Message = "Agency not found.",
-                        Data = false
-                    });
-                }
-
-                return Ok(new ApiResponse<AgencyDto>
-                {
-                    Success = true,
-                    Message = "Record updated successfully",
-                    Data = updatedAgency
-                });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = ex.Message,
-                    Data = false
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = $"Internal server error: {ex.Message}",
-                    Data = false
-                });
-            }
+            var result = await _agencyService.UpdateAsync(id, dto);
+            return this.ToActionResult(result);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<ApiResponse<bool>>> DeleteAgency(Guid id)
         {
             
-            try
-            {
-                var success = await _agencyService.DeleteAsync(id);
-                if (!success)
-                {
-                    return NotFound(new ApiResponse<object>
-                    {
-                        Success = false,
-                        Message = "Agency not found.",
-                        Data = false
-                    });
-                }
-
-                return Ok(new ApiResponse<bool>
-                {
-                    Success = true,
-                    Message = "Record deleted successfully",
-                    Data = true,
-                    Meta = new { AgencyId = id }
-                });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = ex.Message,
-                    Data = false
-                });
-            }
+            var result = await _agencyService.DeleteAsync(id);
+            return this.ToActionResult(result, new { AgencyId = id });
         }
     }
 }
+

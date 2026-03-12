@@ -27,8 +27,9 @@ namespace PropertyInspection.API.Middleware
                 var response = new ApiResponse<object>
                 {
                     Success = false,
-                    Message = "Internal server error",
-                    Data = new { Error = ex.Message }
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError,
+                    Data = null!
                 };
 
                 await httpContext.Response.WriteAsJsonAsync(response);

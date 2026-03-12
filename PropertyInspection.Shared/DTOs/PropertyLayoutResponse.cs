@@ -3,39 +3,38 @@ using PropertyInspection.Core.Enums;
 
 namespace PropertyInspection.Shared.DTOs
 {
-    public class PropertyLayoutDto : BaseEntityDto
+    public class PropertyLayoutResponse : BaseEntityDto
     {
         public Guid? AgencyId { get; set; }
         public PropertyType LayoutType { get; set; }
         public string Name { get; set; } = null!;
         public int DisplayOrder { get; set; }
-        public AgencyDto? Agency { get; set; }
-        public List<LayoutAreaDto> LayoutArea { get; set; } = new List<LayoutAreaDto>();
+        public AgencyResponse? Agency { get; set; }
+        public List<LayoutAreaResponse> LayoutArea { get; set; } = new List<LayoutAreaResponse>();
     }
 
 
-    public class CreatePropertyLayoutDto
+    public class CreatePropertyLayoutRequest
     {
         public Guid? AgencyId { get; set; }
         public PropertyType LayoutType { get; set; }
         public string Name { get; set; } = null!;
         public int DisplayOrder { get; set; }
-        public List<CreateLayoutAreaDto> LayoutArea { get; set; } = new List<CreateLayoutAreaDto>();
+        public List<CreateLayoutAreaRequest> LayoutArea { get; set; } = new List<CreateLayoutAreaRequest>();
     }
 
-    public class CreateLayoutAreaDto 
+    public class CreateLayoutAreaRequest 
     {
         public string AreaName { get; set; } = null!;
         public int DisplayOrder { get; set; }
-        public PropertyLayoutDto? Layout { get; set; }
 
-        public List<CreateLayoutItemDto> LayoutItem { get; set; } = new List<CreateLayoutItemDto>();
+        public List<CreateLayoutItemRequest> LayoutItem { get; set; } = new List<CreateLayoutItemRequest>();
     }
 
-    public class CreateLayoutItemDto
+    public class CreateLayoutItemRequest
     {
         public string ItemName { get; set; } = null!;
         public int DisplayOrder { get; set; }
-        public LayoutAreaDto? Area { get; set; }
     }
 }
+

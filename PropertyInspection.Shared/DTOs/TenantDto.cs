@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using PropertyInspection.Core.Enums;
 
 namespace PropertyInspection.Shared.DTOs
@@ -12,6 +13,7 @@ namespace PropertyInspection.Shared.DTOs
         public string? Email { get; set; }
         public DateTime? RentReviewDate { get; set; }
         public string? RentReviewNotes { get; set; }
+        [JsonIgnore]
         public TenancyDto? Tenancy { get; set; }
     }
 }

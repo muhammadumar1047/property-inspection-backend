@@ -4,6 +4,7 @@ using PropertyInspection.Application.IServices;
 using PropertyInspection.Core.Entities;
 using PropertyInspection.Core.Interfaces.UnitOfWork;
 using PropertyInspection.Shared.DTOs;
+using PropertyInspection.Shared;
 
 namespace PropertyInspection.Application.Services
 {
@@ -16,38 +17,100 @@ namespace PropertyInspection.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ReportTemplateDto?> GenerateReportTemplateForPCR(Guid inspectionId)
+        public async Task<ServiceResponse<ReportTemplateDto>> GenerateReportTemplateForPCR(Guid inspectionId)
         {
-            var inspection = await _unitOfWork.Inspections
-                .FirstOrDefaultAsync(i => i.Id == inspectionId);
+            try
+            {
+                var inspection = await _unitOfWork.Inspections
+                    .FirstOrDefaultAsync(i => i.Id == inspectionId);
 
-            if (inspection == null)
-                return null;
+                if (inspection == null)
+                {
+                    return new ServiceResponse<ReportTemplateDto>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
 
-            var property = await _unitOfWork.Properties
-                .FirstOrDefaultAsync(p => p.Id == inspection.PropertyId);
+                var property = await _unitOfWork.Properties
+                    .FirstOrDefaultAsync(p => p.Id == inspection.PropertyId);
 
-            if (property == null)
-                throw new Exception("Property not found");
+                if (property == null)
+                {
+                    return new ServiceResponse<ReportTemplateDto>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
 
-            return BuildReportTemplateForPCR(property, inspection);
+                return new ServiceResponse<ReportTemplateDto>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = BuildReportTemplateForPCR(property, inspection)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<ReportTemplateDto>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
-        public async Task<ReportTemplateDto?> GenerateReportTemplateForRoutine(Guid inspectionId)
+        public async Task<ServiceResponse<ReportTemplateDto>> GenerateReportTemplateForRoutine(Guid inspectionId)
         {
-            var inspection = await _unitOfWork.Inspections
-                .FirstOrDefaultAsync(i => i.Id == inspectionId);
+            try
+            {
+                var inspection = await _unitOfWork.Inspections
+                    .FirstOrDefaultAsync(i => i.Id == inspectionId);
 
-            if (inspection == null)
-                return null;
+                if (inspection == null)
+                {
+                    return new ServiceResponse<ReportTemplateDto>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
 
-            var property = await _unitOfWork.Properties
-                .FirstOrDefaultAsync(p => p.Id == inspection.PropertyId);
+                var property = await _unitOfWork.Properties
+                    .FirstOrDefaultAsync(p => p.Id == inspection.PropertyId);
 
-            if (property == null)
-                throw new Exception("Property not found");
+                if (property == null)
+                {
+                    return new ServiceResponse<ReportTemplateDto>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
 
-            return BuildReportTemplateForRoutine(property, inspection);
+                return new ServiceResponse<ReportTemplateDto>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = BuildReportTemplateForRoutine(property, inspection)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<ReportTemplateDto>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
         private ReportTemplateDto BuildReportTemplateForPCR(Property property, Inspection inspection)

@@ -9,12 +9,12 @@ namespace PropertyInspection.Infrastructure.Auth
 {
     public interface IUserAuthService
     {
-        Task<ApplicationUser> LoginAsync(string email, string password);
-        Task LogoutAsync();
-        Task<bool> VerifyMfaAsync(string userId, string token);
-        Task<ApplicationUser> CreateUserAsync(ApplicationUser identityUser, string password);
-        Task<IdentityResult> UpdateUserPasswordAsync(string email, string newPassword);
-        Task<bool> DeleteUserAsync(ApplicationUser user);
+        Task<PropertyInspection.Shared.ServiceResponse<ApplicationUser>> LoginAsync(string email, string password);
+        Task<PropertyInspection.Shared.ServiceResponse<bool>> LogoutAsync();
+        Task<PropertyInspection.Shared.ServiceResponse<bool>> VerifyMfaAsync(string userId, string token);
+        Task<PropertyInspection.Shared.ServiceResponse<ApplicationUser>> CreateUserAsync(ApplicationUser identityUser, string password);
+        Task<PropertyInspection.Shared.ServiceResponse<bool>> UpdateUserPasswordAsync(string email, string newPassword);
+        Task<PropertyInspection.Shared.ServiceResponse<bool>> DeleteUserAsync(ApplicationUser user);
 
     }
 }

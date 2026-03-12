@@ -1,7 +1,8 @@
-﻿using PropertyInspection.Application.IServices;
+using PropertyInspection.Application.IServices;
 using PropertyInspection.Core.Entities;
 using PropertyInspection.Core.Interfaces.UnitOfWork;
 using PropertyInspection.Shared.DTOs;
+using PropertyInspection.Shared;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using System;
@@ -27,137 +28,394 @@ namespace PropertyInspection.Application.Services
         }
 
         // CRUD operations
-        public async Task<AgencyWhitelabelDto?> GetByAgencyIdAsync(Guid? agencyId)
+        public async Task<ServiceResponse<AgencyWhitelabelResponse>> GetByAgencyIdAsync(Guid? agencyId)
         {
-            var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
-
-            var whitelabel = await _unitOfWork.AgencyWhitelabels
-                .FirstOrDefaultAsync(w => w.AgencyId == tenantAgencyId);
-            return whitelabel != null ? _mapper.Map<AgencyWhitelabelDto>(whitelabel) : null;
-        }
-
-        public async Task<AgencyWhitelabelDto?> GetByIdAsync(Guid whitelabelId, Guid? agencyId)
-        {
-            var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
-            var whitelabel = await _unitOfWork.AgencyWhitelabels
-                .FirstOrDefaultAsync(w => w.Id == whitelabelId);
-            return whitelabel != null ? _mapper.Map<AgencyWhitelabelDto>(whitelabel) : null;
-        }
-        public async Task<AgencyWhitelabelDto> CreateAsync(CreateAgencyWhitelabelDto createDto)
-        {
-            var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(createDto.AgencyId);
-            // Check if agency already has whitelabel settings
-            if (await ExistsAsync(tenantAgencyId))
+            try
             {
-                throw new InvalidOperationException("Agency already has whitelabel settings. Use update instead.");
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
+
+                var whitelabel = await _unitOfWork.AgencyWhitelabels
+                    .FirstOrDefaultAsync(w => w.AgencyId == tenantAgencyId);
+
+                if (whitelabel == null)
+                {
+                    return new ServiceResponse<AgencyWhitelabelResponse>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
+
+                return new ServiceResponse<AgencyWhitelabelResponse>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = _mapper.Map<AgencyWhitelabelResponse>(whitelabel)
+                };
             }
-
-
-            var whitelabel = _mapper.Map<AgencyWhitelabel>(createDto);
-            whitelabel.AgencyId = tenantAgencyId;
-
-            await _unitOfWork.AgencyWhitelabels.AddAsync(whitelabel);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<AgencyWhitelabelDto>(whitelabel);
+            catch
+            {
+                return new ServiceResponse<AgencyWhitelabelResponse>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
-        public async Task<AgencyWhitelabelDto?> UpdateAsync(Guid whitelabelId, UpdateAgencyWhitelabelDto updateDto)
+        public async Task<ServiceResponse<AgencyWhitelabelResponse>> GetByIdAsync(Guid whitelabelId, Guid? agencyId)
         {
-            var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(updateDto.AgencyId);
+            try
+            {
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
+                var whitelabel = await _unitOfWork.AgencyWhitelabels
+                    .FirstOrDefaultAsync(w => w.Id == whitelabelId);
 
-            var whitelabel = await _unitOfWork.AgencyWhitelabels
-                .FirstOrDefaultAsync(w =>
-                    w.Id == whitelabelId &&
-                    w.AgencyId == tenantAgencyId);
-            if (whitelabel == null)
-                return null;
+                if (whitelabel == null)
+                {
+                    return new ServiceResponse<AgencyWhitelabelResponse>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
 
+                return new ServiceResponse<AgencyWhitelabelResponse>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = _mapper.Map<AgencyWhitelabelResponse>(whitelabel)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<AgencyWhitelabelResponse>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+        public async Task<ServiceResponse<AgencyWhitelabelResponse>> CreateAsync(CreateAgencyWhitelabelRequest createDto)
+        {
+            try
+            {
+                if (createDto == null)
+                {
+                    return new ServiceResponse<AgencyWhitelabelResponse>
+                    {
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    };
+                }
 
-            _mapper.Map(updateDto, whitelabel);
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(createDto.AgencyId);
+                var existsResponse = await ExistsAsync(tenantAgencyId);
+                if (!existsResponse.Success)
+                {
+                    return new ServiceResponse<AgencyWhitelabelResponse>
+                    {
+                        Success = false,
+                        Message = existsResponse.Message,
+                        ErrorCode = existsResponse.ErrorCode
+                    };
+                }
 
-            await _unitOfWork.AgencyWhitelabels.UpdateAsync(whitelabel);
-            await _unitOfWork.CommitAsync();
-            return _mapper.Map<AgencyWhitelabelDto>(whitelabel);
+                if (existsResponse.Data)
+                {
+                    return new ServiceResponse<AgencyWhitelabelResponse>
+                    {
+                        Success = false,
+                        Message = "Record already exists",
+                        ErrorCode = ServiceErrorCodes.Conflict
+                    };
+                }
+
+                var whitelabel = _mapper.Map<AgencyWhitelabel>(createDto);
+                whitelabel.AgencyId = tenantAgencyId;
+
+                await _unitOfWork.AgencyWhitelabels.AddAsync(whitelabel);
+                await _unitOfWork.CommitAsync();
+
+                return new ServiceResponse<AgencyWhitelabelResponse>
+                {
+                    Success = true,
+                    Message = "Entity created successfully",
+                    Data = _mapper.Map<AgencyWhitelabelResponse>(whitelabel)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<AgencyWhitelabelResponse>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
-        public async Task<bool> DeleteAsync(Guid whitelabelId, Guid? agencyId)
+        public async Task<ServiceResponse<AgencyWhitelabelResponse>> UpdateAsync(Guid whitelabelId, UpdateAgencyWhitelabelRequest updateDto)
         {
-            var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
+            try
+            {
+                if (updateDto == null)
+                {
+                    return new ServiceResponse<AgencyWhitelabelResponse>
+                    {
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    };
+                }
 
-            var whitelabel = await _unitOfWork.AgencyWhitelabels
-                .FirstOrDefaultAsync(w =>
-                    w.Id == whitelabelId &&
-                    w.AgencyId == tenantAgencyId);
-            if (whitelabel == null)
-                return false;
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(updateDto.AgencyId);
 
-            _unitOfWork.AgencyWhitelabels.Remove(whitelabel);
-            await _unitOfWork.CommitAsync();
-            return true;
+                var whitelabel = await _unitOfWork.AgencyWhitelabels
+                    .FirstOrDefaultAsync(w =>
+                        w.Id == whitelabelId &&
+                        w.AgencyId == tenantAgencyId);
+                if (whitelabel == null)
+                {
+                    return new ServiceResponse<AgencyWhitelabelResponse>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
+
+                _mapper.Map(updateDto, whitelabel);
+
+                await _unitOfWork.AgencyWhitelabels.UpdateAsync(whitelabel);
+                await _unitOfWork.CommitAsync();
+
+                return new ServiceResponse<AgencyWhitelabelResponse>
+                {
+                    Success = true,
+                    Message = "Record updated successfully",
+                    Data = _mapper.Map<AgencyWhitelabelResponse>(whitelabel)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<AgencyWhitelabelResponse>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> DeleteAsync(Guid whitelabelId, Guid? agencyId)
+        {
+            try
+            {
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
+
+                var whitelabel = await _unitOfWork.AgencyWhitelabels
+                    .FirstOrDefaultAsync(w =>
+                        w.Id == whitelabelId &&
+                        w.AgencyId == tenantAgencyId);
+                if (whitelabel == null)
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Record not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
+
+                _unitOfWork.AgencyWhitelabels.Remove(whitelabel);
+                await _unitOfWork.CommitAsync();
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Record deleted successfully",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
         // Branding operations
-        public async Task<WhitelabelBrandingDto> GetBrandingAsync(Guid? agencyId)
+        public async Task<ServiceResponse<WhitelabelBrandingDto>> GetBrandingAsync(Guid? agencyId)
         {
-            var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
-
-            var whitelabel = await _unitOfWork.AgencyWhitelabels
-                .FirstOrDefaultAsync(w => w.AgencyId == tenantAgencyId);
-
-            if (whitelabel == null)
+            try
             {
-                // Return default branding
-                var defaultBranding = await GetDefaultBrandingAsync();
-                return _mapper.Map<WhitelabelBrandingDto>(defaultBranding);
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
+
+                var whitelabel = await _unitOfWork.AgencyWhitelabels
+                    .FirstOrDefaultAsync(w => w.AgencyId == tenantAgencyId);
+
+                if (whitelabel == null)
+                {
+                    var defaultBranding = await GetDefaultBrandingAsync();
+                    return new ServiceResponse<WhitelabelBrandingDto>
+                    {
+                        Success = true,
+                        Message = "Record retrieved successfully",
+                        Data = _mapper.Map<WhitelabelBrandingDto>(defaultBranding.Data)
+                    };
+                }
+
+                return new ServiceResponse<WhitelabelBrandingDto>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = _mapper.Map<WhitelabelBrandingDto>(whitelabel)
+                };
             }
-
-            return _mapper.Map<WhitelabelBrandingDto>(whitelabel);
-        }
-
-        public async Task<WhitelabelReportSettingsDto> GetReportSettingsAsync(Guid? agencyId)
-        {
-            var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
-
-            var whitelabel = await _unitOfWork.AgencyWhitelabels
-                .FirstOrDefaultAsync(w => w.AgencyId == tenantAgencyId);
-
-            if (whitelabel == null)
+            catch
             {
-                // Return default report settings
-                var defaultBranding = await GetDefaultBrandingAsync();
-                return _mapper.Map<WhitelabelReportSettingsDto>(defaultBranding);
+                return new ServiceResponse<WhitelabelBrandingDto>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
             }
-
-            return _mapper.Map<WhitelabelReportSettingsDto>(whitelabel);
         }
 
-        public async Task<DefaultWhitelabelDto> GetDefaultBrandingAsync()
+        public async Task<ServiceResponse<WhitelabelReportSettingsDto>> GetReportSettingsAsync(Guid? agencyId)
         {
-            return await Task.FromResult(new DefaultWhitelabelDto());
+            try
+            {
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
+
+                var whitelabel = await _unitOfWork.AgencyWhitelabels
+                    .FirstOrDefaultAsync(w => w.AgencyId == tenantAgencyId);
+
+                if (whitelabel == null)
+                {
+                    var defaultBranding = await GetDefaultBrandingAsync();
+                    return new ServiceResponse<WhitelabelReportSettingsDto>
+                    {
+                        Success = true,
+                        Message = "Record retrieved successfully",
+                        Data = _mapper.Map<WhitelabelReportSettingsDto>(defaultBranding.Data)
+                    };
+                }
+
+                return new ServiceResponse<WhitelabelReportSettingsDto>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = _mapper.Map<WhitelabelReportSettingsDto>(whitelabel)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<WhitelabelReportSettingsDto>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
-        public async Task<bool> ExistsAsync(Guid? agencyId)
+        public async Task<ServiceResponse<DefaultWhitelabelDto>> GetDefaultBrandingAsync()
         {
-            var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
+            return await Task.FromResult(new ServiceResponse<DefaultWhitelabelDto>
+            {
+                Success = true,
+                Message = "Record retrieved successfully",
+                Data = new DefaultWhitelabelDto()
+            });
+        }
 
-            return await _unitOfWork.AgencyWhitelabels
-                .CountAsync(w => w.AgencyId == tenantAgencyId) > 0;
+        public async Task<ServiceResponse<bool>> ExistsAsync(Guid? agencyId)
+        {
+            try
+            {
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
+
+                var exists = await _unitOfWork.AgencyWhitelabels
+                    .CountAsync(w => w.AgencyId == tenantAgencyId) > 0;
+
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = exists
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
         // Utility operations
-        public async Task<IEnumerable<AgencyWhitelabelDto>> GetActiveWhitelabelsAsync()
+        public async Task<ServiceResponse<IReadOnlyList<AgencyWhitelabelResponse>>> GetActiveWhitelabelsAsync()
         {
-            var whitelabels = await _unitOfWork.AgencyWhitelabels.GetAsync(
-                predicate: w => EF.Property<bool>(w, "IsActive"),
-                orderBy: q => q.OrderBy(w => EF.Property<int>(w, "WhitelabelId")));
-            return _mapper.Map<IEnumerable<AgencyWhitelabelDto>>(whitelabels);
+            try
+            {
+                var whitelabels = await _unitOfWork.AgencyWhitelabels.GetAsync(
+                    predicate: w => EF.Property<bool>(w, "IsActive"),
+                    orderBy: q => q.OrderBy(w => EF.Property<int>(w, "WhitelabelId")));
+                return new ServiceResponse<IReadOnlyList<AgencyWhitelabelResponse>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = _mapper.Map<List<AgencyWhitelabelResponse>>(whitelabels)
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<IReadOnlyList<AgencyWhitelabelResponse>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
-        public async Task<string> SerializeContactDetailsAsync(WhitelabelContactDetailsDto contactDetails)
+        public async Task<ServiceResponse<string>> SerializeContactDetailsAsync(WhitelabelContactDetailsDto contactDetails)
         {
-            return await Task.FromResult(JsonSerializer.Serialize(contactDetails));
+            try
+            {
+                return await Task.FromResult(new ServiceResponse<string>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = JsonSerializer.Serialize(contactDetails)
+                });
+            }
+            catch
+            {
+                return new ServiceResponse<string>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
         }
 
         // Helper methods
     }
 }
+

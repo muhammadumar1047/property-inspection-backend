@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using PropertyInspection.API.Authorization;
@@ -21,76 +21,49 @@ namespace PropertyInspection.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ApiResponse<PagedResult<UserDto>>>> GetUsers(
+        public async Task<ActionResult<ApiResponse<PagedResult<UserResponse>>>> GetUsers(
            [FromQuery] UserFilterDto filter,
            [FromQuery] Guid? agencyId,
            [FromQuery] int page = 1,
            [FromQuery] int pageSize = 10)
         {
-            var users = await _userService.GetUsersAsync(
+            var result = await _userService.GetUsersAsync(
                 filter, agencyId, page, pageSize);
-
-            return Ok(new ApiResponse<PagedResult<UserDto>>
-            {
-                Success = true,
-                Message = "Users fetched successfully",
-                Data = users
-            });
+            return this.ToActionResult(result);
         }
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResponse<UserDto>>> GetById(Guid id)
+        public async Task<ActionResult<ApiResponse<UserResponse>>> GetById(Guid id)
         {
-            var user = await _userService.GetByIdAsync(id);
-
-            return Ok(new ApiResponse<UserDto>
-            {
-                Success = true,
-                Message = "User fetched successfully",
-                Data = user
-            });
+            var result = await _userService.GetByIdAsync(id);
+            return this.ToActionResult(result);
         }
 
         [HttpPost]
         //[Permission("inspection.create")]
-        public async Task<ActionResult<ApiResponse<UserDto>>> Create([FromBody] CreateUserDto dto)
+        public async Task<ActionResult<ApiResponse<UserResponse>>> Create([FromBody] CreateUserRequest dto)
         {
             var userId = Guid.Parse(User.GetDomainUserId());
-            var user = await _userService.CreateAsync(dto);
-
-            return Ok(new ApiResponse<UserDto>
-            {
-                Success = true,
-                Message = "User created successfully",
-                Data = user
-            });
+            var result = await _userService.CreateAsync(dto);
+            return this.ToActionResult(result);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResponse<string>>> Update(Guid id, [FromBody] UpdateUserDto dto)
+        public async Task<ActionResult<ApiResponse<bool>>> Update(Guid id, [FromBody] UpdateUserRequest dto)
         {
             Guid userId = Guid.Parse(User.GetDomainUserId());
-            await _userService.UpdateAsync(id, dto, userId);
-
-            return Ok(new ApiResponse<string>
-            {
-                Success = true,
-                Message = "User updated successfully"
-            });
+            var result = await _userService.UpdateAsync(id, dto, userId);
+            return this.ToActionResult(result);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ApiResponse<string>>> Delete(Guid id)
+        public async Task<ActionResult<ApiResponse<bool>>> Delete(Guid id)
         {
             var userId = Guid.Parse(User.GetDomainUserId());
-            await _userService.DeleteAsync(id, userId);
-
-            return Ok(new ApiResponse<string>
-            {
-                Success = true,
-                Message = "User deleted successfully"
-            });
+            var result = await _userService.DeleteAsync(id, userId);
+            return this.ToActionResult(result);
         }
     }
 }
+

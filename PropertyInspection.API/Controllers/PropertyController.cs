@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PropertyInspection.API.Authorization;
+using PropertyInspection.API.Extensions;
 using PropertyInspection.Application.IServices;
 using PropertyInspection.Core.Enums;
 using PropertyInspection.Shared;
@@ -22,7 +23,7 @@ namespace PropertyInspection.API.Controllers
 
         //[Permission("property.view")]
         [HttpGet]
-        public async Task<ActionResult<ApiResponse<PagedResult<PropertyDto>>>> GetAllByAgency(
+        public async Task<ActionResult<ApiResponse<PagedResult<PropertyResponse>>>> GetAllByAgency(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] PropertyType? propertyType = null,
@@ -35,7 +36,7 @@ namespace PropertyInspection.API.Controllers
         {
           
 
-            var (properties, totalCount) = await _propertyService.GetAllByAgencyAsync(
+            var result = await _propertyService.GetAllByAgencyAsync(
                 agencyId,
                 pageNumber,
                 pageSize,
@@ -46,144 +47,43 @@ namespace PropertyInspection.API.Controllers
                 suburb,
                 isActive
             );
-
-            var result = new PagedResult<PropertyDto>
-            {
-                Data = properties.ToList(),
-                Page = pageNumber,
-                PageSize = pageSize,
-                TotalCount = totalCount
-            };
-
-            return Ok(new ApiResponse<PagedResult<PropertyDto>>
-            {
-                Success = true,
-                Message = "Records retrieved successfully",
-                Data = result,
-                Meta = new { Count = result.Data.Count }
-            });
+            return this.ToActionResult(result, new { Count = result.Data?.Data.Count ?? 0 });
         }
 
         [Permission("property.view")]
         [HttpGet("{propertyId}")]
-        public async Task<ActionResult<ApiResponse<PropertyDto>>> GetById(Guid propertyId, Guid? agencyId)
+        public async Task<ActionResult<ApiResponse<PropertyResponse>>> GetById(Guid propertyId, Guid? agencyId)
         {
-            var property = await _propertyService.GetByIdAsync(propertyId,agencyId);
-            if (property == null)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Record not found.",
-                    Data = false
-                });
-            }
-
-            return Ok(new ApiResponse<PropertyDto>
-            {
-                Success = true,
-                Message = "Record retrieved successfully",
-                Data = property
-            });
+            var result = await _propertyService.GetByIdAsync(propertyId, agencyId);
+            return this.ToActionResult(result);
         }
 
         [Permission("property.create")]
         [HttpPost]
-        public async Task<ActionResult<ApiResponse<PropertyDto>>> Create([FromBody] PropertyDto propertyDto)
+        public async Task<ActionResult<ApiResponse<PropertyResponse>>> Create([FromBody] CreatePropertyRequest propertyRequest)
         {
-            try
-            {
-               
-                var createdProperty = await _propertyService.CreateAsync(propertyDto);
-
-                return CreatedAtAction(
-                    nameof(GetById),
-                    new { propertyId = createdProperty.Id },
-                    new ApiResponse<PropertyDto>
-                    {
-                        Success = true,
-                        Message = "Entity created successfully",
-                        Data = createdProperty
-                    }
-                );
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = ex.Message,
-                    Data = false
-                });
-            }
+            var result = await _propertyService.CreateAsync(propertyRequest);
+            return this.ToCreatedAtActionResult(
+                nameof(GetById),
+                new { propertyId = result.Data?.Id ?? Guid.Empty },
+                result);
         }
 
         [Permission("property.update")]
         [HttpPut("{propertyId}")]
-        public async Task<ActionResult<ApiResponse<bool>>> Update(Guid propertyId, [FromBody] PropertyDto propertyDto)
+        public async Task<ActionResult<ApiResponse<bool>>> Update(Guid propertyId, [FromBody] UpdatePropertyRequest propertyRequest)
         {
-            if (propertyId != propertyDto.Id)
-            {
-                return BadRequest(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Property ID mismatch",
-                    Data = false
-                });
-            }
-
-            try
-            {
-                var updatedProperty = await _propertyService.UpdateAsync(propertyDto);
-                if (updatedProperty == null)
-                {
-                    return NotFound(new ApiResponse<object>
-                    {
-                        Success = false,
-                        Message = "Record not found.",
-                        Data = false
-                    });
-                }
-
-                return Ok(new ApiResponse<bool>
-                {
-                    Success = true,
-                    Message = "Record updated successfully",
-                    Data = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = ex.Message,
-                    Data = false
-                });
-            }
+            var result = await _propertyService.UpdateAsync(propertyId, propertyRequest);
+            return this.ToActionResult(result);
         }
 
         [Permission("property.delete")]
         [HttpDelete("{propertyId}")]
         public async Task<ActionResult<ApiResponse<bool>>> Delete(Guid propertyId, Guid? agencyId)
         {
-            var deleted = await _propertyService.DeletePropertyAsync(propertyId, agencyId);
-            if (!deleted)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Record not found.",
-                    Data = false
-                });
-            }
-
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Message = "Record deleted successfully",
-                Data = true
-            });
+            var result = await _propertyService.DeletePropertyAsync(propertyId, agencyId);
+            return this.ToActionResult(result);
         }
     }
 }
+

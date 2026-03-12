@@ -4,7 +4,7 @@ using PropertyInspection.Shared.Auth;
 
 namespace PropertyInspection.Shared.DTOs
 {
-    public class InspectionDto
+    public class InspectionResponse
     {
         public Guid Id { get; set; }
         public Guid AgencyId { get; set; }
@@ -17,12 +17,13 @@ namespace PropertyInspection.Shared.DTOs
         public InspectionStatus InspectionStatus { get; set; }
         public DateTime InspectionDate { get; set; }
         public TimeSpan InspectionTime { get; set; }
-        public PropertyDto? Property { get; set; }
-        public AgencyDto? Agency { get; set; }
-        public UserDto? Inspector { get; set; }
+        public PropertyResponse? Property { get; set; }
+        public AgencyResponse? Agency { get; set; }
+        public UserResponse? Inspector { get; set; }
 
         public bool isActive { get; set; }
         public List<LandlordSnapshotDto>? LandlordSnapshots { get; set; }
         public List<TenancySnapshotDto>? TenancySnapshots { get; set; }
     }
 }
+

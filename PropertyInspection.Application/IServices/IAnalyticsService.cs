@@ -1,11 +1,12 @@
 
 
 using PropertyInspection.Shared.DTOs;
+using PropertyInspection.Shared;
 
 namespace PropertyInspection.Application.IServices
 {
     public interface IAnalyticsService
     {
-        Task<AnalyticsDto> GetDashboardAnalyticsByAgencyAsync(Guid agencyId);
+        Task<ServiceResponse<AnalyticsDto>> GetDashboardAnalyticsByAgencyAsync(Guid agencyId);
     }
 }

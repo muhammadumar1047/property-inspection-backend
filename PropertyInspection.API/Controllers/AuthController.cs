@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PropertyInspection.API.Extensions;
 using PropertyInspection.Application.IServices;
 using PropertyInspection.Infrastructure.Auth;
 using PropertyInspection.Shared;
@@ -33,17 +34,18 @@ namespace PropertyInspection.API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<ApiResponse<object>>> Login(LoginDto dto)
         {
-            var identityUser = await _userAuthService.LoginAsync(dto.Email, dto.Password);
-
-            if (identityUser == null)
+            var loginResult = await _userAuthService.LoginAsync(dto.Email, dto.Password);
+            if (!loginResult.Success || loginResult.Data == null)
             {
-                return Unauthorized(new ApiResponse<object>
+                return this.ToActionResult(new ServiceResponse<object>
                 {
                     Success = false,
-                    Message = "Invalid credentials",
-                    Data = false
+                    Message = loginResult.Message,
+                    ErrorCode = loginResult.ErrorCode
                 });
             }
+
+            var identityUser = loginResult.Data;
 
             if (identityUser.TwoFactorEnabled)
             {
@@ -55,17 +57,20 @@ namespace PropertyInspection.API.Controllers
                 });
             }
 
-            var domainUser = await _userService.GetUserWithRolesByIdentityIdAsync(identityUser.Id);
-
-            if (domainUser == null)
+            var domainUserResult = await _userService.GetUserWithRolesByIdentityIdAsync(identityUser.Id);
+            if (!domainUserResult.Success || domainUserResult.Data == null)
             {
-                return Unauthorized(new ApiResponse<object>
+                return this.ToActionResult(new ServiceResponse<object>
                 {
                     Success = false,
-                    Message = "Domain user not found",
-                    Data = false
+                    Message = domainUserResult.Message,
+                    ErrorCode = domainUserResult.ErrorCode == ServiceErrorCodes.NotFound
+                        ? ServiceErrorCodes.Unauthorized
+                        : domainUserResult.ErrorCode
                 });
             }
+
+            var domainUser = domainUserResult.Data;
 
             var fullName = string.Join(" ",
                 new[] { domainUser.FirstName, domainUser.LastName }
@@ -88,11 +93,11 @@ namespace PropertyInspection.API.Controllers
             {
                 if (domainUser.AgencyId == null)
                 {
-                    return Unauthorized(new ApiResponse<object>
+                    return this.ToActionResult(new ServiceResponse<object>
                     {
                         Success = false,
-                        Message = "Agency missing",
-                        Data = false
+                        Message = "Unauthorized",
+                        ErrorCode = ServiceErrorCodes.Unauthorized
                     });
                 }
 
@@ -107,16 +112,16 @@ namespace PropertyInspection.API.Controllers
                     {
                         claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
 
-                        //if (role.Permissions != null)
-                        //{
-                        //    foreach (var permission in role.Permissions)
-                        //    {
-                        //        if (!string.IsNullOrWhiteSpace(permission.Name))
-                        //        {
-                        //            permissions.Add(permission.Name);
-                        //        }
-                        //    }
-                        //}
+                        if (role.Permissions != null)
+                        {
+                            foreach (var permission in role.Permissions)
+                            {
+                                if (!string.IsNullOrWhiteSpace(permission.Name))
+                                {
+                                    permissions.Add(permission.Name);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -157,13 +162,8 @@ namespace PropertyInspection.API.Controllers
         [HttpPost("logout")]
         public async Task<ActionResult<ApiResponse<bool>>> Logout()
         {
-            await _userAuthService.LogoutAsync();
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Message = "Logged out successfully",
-                Data = true
-            });
+            var result = await _userAuthService.LogoutAsync();
+            return this.ToActionResult(result);
         }
 
         [HttpPost("update-password")]
@@ -171,32 +171,16 @@ namespace PropertyInspection.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ApiResponse<object>
+                return this.ToActionResult(new ServiceResponse<bool>
                 {
                     Success = false,
-                    Message = "Validation failed",
-                    Data = ModelState
+                    Message = "Invalid request data",
+                    ErrorCode = ServiceErrorCodes.InvalidRequest
                 });
             }
 
             var result = await _userAuthService.UpdateUserPasswordAsync(model.Email, model.NewPassword);
-
-            if (!result.Succeeded)
-            {
-                return BadRequest(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Password update failed",
-                    Data = result.Errors.Select(e => e.Description).ToList()
-                });
-            }
-
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Message = "Password updated successfully",
-                Data = true
-            });
+            return this.ToActionResult(result);
         }
     }
 }

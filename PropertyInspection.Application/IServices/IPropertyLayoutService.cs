@@ -1,6 +1,7 @@
 
 
 using PropertyInspection.Shared.DTOs;
+using PropertyInspection.Shared;
 
 namespace PropertyInspection.Application.IServices
 {
@@ -9,7 +10,7 @@ namespace PropertyInspection.Application.IServices
         /// <summary>
         /// Get all layouts for a specific agency.
         /// </summary>
-        Task<(IEnumerable<PropertyLayoutDto>,int TotalCount)> GetAllByAgencyAsync(
+        Task<ServiceResponse<PagedResult<PropertyLayoutResponse>>> GetAllByAgencyAsync(
             Guid? agencyId,
             int pageNumber = 1,
             int pageSize = 10
@@ -18,21 +19,22 @@ namespace PropertyInspection.Application.IServices
         /// <summary>
         /// Get a single layout by its ID and agency.
         /// </summary>
-        Task<PropertyLayoutDto?> GetByIdAsync(Guid layoutId, Guid? agencyId);
+        Task<ServiceResponse<PropertyLayoutResponse>> GetByIdAsync(Guid layoutId, Guid? agencyId);
 
         /// <summary>
         /// Create a new layout (with nested areas and items).
         /// </summary>
-        Task<PropertyLayoutDto> CreateAsync(CreatePropertyLayoutDto layoutDto);
+        Task<ServiceResponse<PropertyLayoutResponse>> CreateAsync(CreatePropertyLayoutRequest layoutDto);
 
         /// <summary>
         /// Update an existing layout (with nested areas and items).
         /// </summary>
-        Task<PropertyLayoutDto> UpdateAsync(PropertyLayoutDto layoutDto);
+        Task<ServiceResponse<bool>> UpdateAsync(Guid layoutId, UpdatePropertyLayoutRequest layoutRequest);
 
         /// <summary>
         /// Delete a layout by ID and agency.
         /// </summary>
-        Task<bool> DeleteAsync(Guid layoutId, Guid? agencyId);
+        Task<ServiceResponse<bool>> DeleteAsync(Guid layoutId, Guid? agencyId);
     }
 }
+

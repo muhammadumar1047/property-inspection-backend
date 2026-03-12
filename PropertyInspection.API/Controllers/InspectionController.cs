@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PropertyInspection.API.Authorization;
+using PropertyInspection.API.Extensions;
 using PropertyInspection.Application.IServices;
 using PropertyInspection.Core.Enums;
 using PropertyInspection.Shared;
@@ -20,7 +21,7 @@ namespace PropertyInspection.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ApiResponse<PagedResult<InspectionDto>>>> GetAllInspections(
+        public async Task<ActionResult<ApiResponse<PagedResult<InspectionResponse>>>> GetAllInspections(
             Guid? agencyId,
             Guid inspectionId = default,
             int pageNumber = 1,
@@ -35,187 +36,67 @@ namespace PropertyInspection.API.Controllers
             string? searchProperty = null
         )
         {
-            var (inspections, totalCount) = await _inspectionService.GetAllInspectionsAsync(
+            var result = await _inspectionService.GetAllInspectionsAsync(
                 agencyId,
                 inspectionId, pageNumber, pageSize,
                 inspectionType, inspectionStatus, inspectorId,
                 suburb, inspectionDate, startDate, endDate, searchProperty
             );
-
-            var result = new PagedResult<InspectionDto>
-            {
-                Data = inspections.ToList(),
-                Page = pageNumber,
-                PageSize = pageSize,
-                TotalCount = totalCount
-            };
-
-            return Ok(new ApiResponse<PagedResult<InspectionDto>>
-            {
-                Success = true,
-                Message = "Records retrieved successfully",
-                Data = result,
-                Meta = new { Count = result.Data.Count }
-            });
+            return this.ToActionResult(result, new { Count = result.Data?.Data.Count ?? 0 });
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResponse<InspectionDto>>> GetById(Guid id, Guid? agencyId)
+        public async Task<ActionResult<ApiResponse<InspectionResponse>>> GetById(Guid id, Guid? agencyId)
         {
-            var inspection = await _inspectionService.GetByIdAsync(id , agencyId);
-            if (inspection == null)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Record not found.",
-                    Data = false
-                });
-            }
-
-            return Ok(new ApiResponse<InspectionDto>
-            {
-                Success = true,
-                Message = "Record retrieved successfully",
-                Data = inspection
-            });
+            var result = await _inspectionService.GetByIdAsync(id , agencyId);
+            return this.ToActionResult(result);
         }
 
         [HttpGet("property/{propertyId}")]
-        public async Task<ActionResult<ApiResponse<IReadOnlyList<InspectionDto>>>> GetByProperty(Guid propertyId , Guid? agencyId)
+        public async Task<ActionResult<ApiResponse<IReadOnlyList<InspectionResponse>>>> GetByProperty(Guid propertyId , Guid? agencyId)
         {
-            var inspections = await _inspectionService.GetAllByPropertyAsync(propertyId ,agencyId);
-            return Ok(new ApiResponse<IReadOnlyList<InspectionDto>>
-            {
-                Success = true,
-                Message = "Records retrieved successfully",
-                Data = inspections,
-                Meta = new { Count = inspections.Count }
-            });
+            var result = await _inspectionService.GetAllByPropertyAsync(propertyId ,agencyId);
+            return this.ToActionResult(result, new { Count = result.Data?.Count ?? 0 });
         }
 
         [HttpPost]
         [Permission("inspection.create")]
-        public async Task<ActionResult<ApiResponse<InspectionDto>>> Create([FromBody] CreateInspectionDto inspectionDto)
+        public async Task<ActionResult<ApiResponse<InspectionResponse>>> Create([FromBody] CreateInspectionRequest inspectionDto)
         {
-            if (inspectionDto == null)
-            {
-                return BadRequest(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Inspection data is required.",
-                    Data = false
-                });
-            }
-
-            var created = await _inspectionService.CreateAsync(inspectionDto);
-            return CreatedAtAction(
+            var result = await _inspectionService.CreateAsync(inspectionDto);
+            return this.ToCreatedAtActionResult(
                 nameof(GetById),
-                new { id = created.Id },
-                new ApiResponse<InspectionDto>
-                {
-                    Success = true,
-                    Message = "Entity created successfully",
-                    Data = created
-                });
+                new { id = result.Data?.Id ?? Guid.Empty },
+                result);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResponse<bool>>> Update(Guid id, [FromBody] InspectionDto inspectionDto)
+        public async Task<ActionResult<ApiResponse<bool>>> Update(Guid id, [FromBody] UpdateInspectionRequest inspectionRequest)
         {
-            if (inspectionDto == null || id != inspectionDto.Id)
-            {
-                return BadRequest(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Invalid inspection data.",
-                    Data = false
-                });
-            }
-
-            var updated = await _inspectionService.UpdateAsync(inspectionDto);
-            if (updated == null)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Record not found.",
-                    Data = false
-                });
-            }
-
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Message = "Record updated successfully",
-                Data = true
-            });
+            var result = await _inspectionService.UpdateAsync(id, inspectionRequest);
+            return this.ToActionResult(result);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<ApiResponse<bool>>> Delete(Guid id , Guid? agencyId)
         {
-            var deleted = await _inspectionService.DeleteAsync(id , agencyId);
-            if (!deleted)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Record not found.",
-                    Data = false
-                });
-            }
-
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Message = "Record deleted successfully",
-                Data = true
-            });
+            var result = await _inspectionService.DeleteAsync(id , agencyId);
+            return this.ToActionResult(result);
         }
 
         [HttpDelete("landlord-snapshot/{id}")]
         public async Task<ActionResult<ApiResponse<bool>>> DeleteLandlordSnapshot(Guid id, Guid? agencyId)
         {
-            var deleted = await _inspectionService.DeleteLandlordSnapshotAsync(id, agencyId);
-            if (!deleted)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Record not found.",
-                    Data = false
-                });
-            }
-
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Message = "Record deleted successfully",
-                Data = true
-            });
+            var result = await _inspectionService.DeleteLandlordSnapshotAsync(id, agencyId);
+            return this.ToActionResult(result);
         }
 
         [HttpDelete("tenancy-snapshot/{id}")]
         public async Task<ActionResult<ApiResponse<bool>>> DeleteTenancySnapshot(Guid id, Guid? agencyId)
         {
-            var deleted = await _inspectionService.DeleteTenancySnapshotAsync(id, agencyId);
-            if (!deleted)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Record not found.",
-                    Data = false
-                });
-            }
-
-            return Ok(new ApiResponse<bool>
-            {
-                Success = true,
-                Message = "Record deleted successfully",
-                Data = true
-            });
+            var result = await _inspectionService.DeleteTenancySnapshotAsync(id, agencyId);
+            return this.ToActionResult(result);
         }
     }
 }
+
