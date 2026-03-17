@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using PropertyInspection.Core.Enums;
 
 namespace PropertyInspection.Shared.DTOs
@@ -8,6 +9,8 @@ namespace PropertyInspection.Shared.DTOs
         public Guid Id { get; set; }
         public Guid ReportAreaId { get; set; }
         public string Name { get; set; } = null!;
+
+        [JsonIgnore]
         public ReportAreaDto? ReportArea { get; set; }
 
         public List<ReportItemConditionDto> ReportItemConditions { get; set; } = new();

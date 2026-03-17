@@ -53,11 +53,16 @@ namespace PropertyInspection.Application.Services
                     pageNumber: pageNumber,
                     pageSize: pageSize,
                     predicate: a =>
+                        !a.IsDeleted &&
                         (!countryId.HasValue || a.CountryId == countryId) &&
                         (!stateId.HasValue || a.StateId == stateId) &&
                         (string.IsNullOrWhiteSpace(name) || a.LegalBusinessName.Contains(name)) &&
                         (string.IsNullOrWhiteSpace(suburb) || (a.Suburb != null && a.Suburb.Contains(suburb))),
-                    include: q => q.Include(a => a.AgencyWhitelabel).AsNoTracking(),
+                    include: q => q
+                        .Include(a => a.AgencyWhitelabel)
+                        .Include(a => a.Country)
+                        .Include(a => a.State)
+                        .AsNoTracking(),
                     orderBy: q => q.OrderBy(a => a.LegalBusinessName)
                 );
 

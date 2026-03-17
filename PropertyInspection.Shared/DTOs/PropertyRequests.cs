@@ -7,7 +7,7 @@ namespace PropertyInspection.Shared.DTOs
     public class PropertyRequestBase
     {
         public Guid? AgencyId { get; set; }
-        public string Name { get; set; } = null!;
+        public string? Name { get; set; } = null!;
         public PropertyType Type { get; set; }
         public Guid PropertyManagerId { get; set; }
         public string Address1 { get; set; } = null!;

@@ -72,7 +72,6 @@ builder.Services.AddScoped<IAgencyRoleProvisioningService, RoleSeeder>();
 builder.Services.AddAWSService<IAmazonS3>();
 
 builder.Services.AddScoped<IAgencyService, AgencyService>();
-builder.Services.AddScoped<IAgencyManagementService, AgencyManagementService>();
 builder.Services.AddScoped<IAgencyWhitelabelService, AgencyWhitelabelService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddScoped<IInspectionService, InspectionService>();
@@ -85,6 +84,7 @@ builder.Services.AddScoped<IS3Service, S3Service>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<ILookupService, LookupService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 

@@ -61,8 +61,8 @@ namespace PropertyInspection.Application.Services
                         .Include(i => i.Property)
                             .ThenInclude(p => p.Tenancies)
                         .Include(i => i.Property)
-                            .ThenInclude(p => p.Landlords)
-                        .Include(i => i.InspectionType));
+                            .ThenInclude(p => p.Landlords));
+                        //.Include(i => i.InspectionType));
 
                 var propertyResults = _mapper.Map<List<SearchResultDto>>(properties)
                     .OrderBy(r => r.Address1)

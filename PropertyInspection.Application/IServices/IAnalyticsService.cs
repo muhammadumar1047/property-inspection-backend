@@ -7,6 +7,6 @@ namespace PropertyInspection.Application.IServices
 {
     public interface IAnalyticsService
     {
-        Task<ServiceResponse<AnalyticsDto>> GetDashboardAnalyticsByAgencyAsync(Guid agencyId);
+        Task<ServiceResponse<AnalyticsDto>> GetDashboardAnalyticsByAgencyAsync(Guid? agencyId);
     }
 }

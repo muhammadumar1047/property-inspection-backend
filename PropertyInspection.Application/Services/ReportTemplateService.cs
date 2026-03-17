@@ -34,8 +34,13 @@ namespace PropertyInspection.Application.Services
                     };
                 }
 
-                var property = await _unitOfWork.Properties
-                    .FirstOrDefaultAsync(p => p.Id == inspection.PropertyId);
+                var property = await _unitOfWork.Properties.FirstOrDefaultAsync(
+                    p => p.Id == inspection.PropertyId,
+                    include: query => query
+                        .Include(p => p.PropertyLayout)
+                            .ThenInclude(pl => pl.Areas)
+                                .ThenInclude(a => a.Items)
+                );
 
                 if (property == null)
                 {
@@ -82,8 +87,13 @@ namespace PropertyInspection.Application.Services
                     };
                 }
 
-                var property = await _unitOfWork.Properties
-                    .FirstOrDefaultAsync(p => p.Id == inspection.PropertyId);
+                var property = await _unitOfWork.Properties.FirstOrDefaultAsync(
+                    p => p.Id == inspection.PropertyId,
+                    include: query => query
+                        .Include(p => p.PropertyLayout)
+                            .ThenInclude(pl => pl.Areas)
+                                .ThenInclude(a => a.Items)
+                );
 
                 if (property == null)
                 {
@@ -124,7 +134,7 @@ namespace PropertyInspection.Application.Services
                 ReportAreas = new List<ReportTemplateAreaDto>()
             };
 
-            template.ReportAreas.Add(ReportTemplateFactory.GenerateAdditionalChecksAreaForPCR());
+            template.ReportAreas.Add(ReportTemplateFactory.GenerateUtilitiesAreaForPCR());
 
             if (property.PropertyLayout?.Areas != null)
             {
@@ -137,14 +147,20 @@ namespace PropertyInspection.Application.Services
                         ReportItems = layoutArea.Items.Select(item => new ReportTemplateItemDto
                         {
                             Name = item.ItemName,
-                            ReportItemConditions = new List<ReportTemplateItemConditionDto>
+                        ReportItemConditions = new List<ReportTemplateItemConditionDto>
                             {
                                 new() { Description = "Clean", Value = "false" },
                                 new() { Description = "Undamaged", Value = "false" },
                                 new() { Description = "Working", Value = "false" }
                             },
-                            ReportItemComments = new List<ReportTemplateItemCommentDto>(),
-                            ReportMedia = new List<ReportTemplateMediaDto>()
+                            ReportItemComments = new List<ReportTemplateItemCommentDto>
+                            {
+                                new() { Text = "" },
+                            },
+                            ReportMedia = new List<ReportTemplateMediaDto>
+                            {
+                                new() { Url = "", Type = "" },
+                            }
                         }).ToList()
                     };
 
@@ -189,8 +205,14 @@ namespace PropertyInspection.Application.Services
                             new() { Description = "Action required by tenant", Value = "false" },
                             new() { Description = "Action required by landlord", Value = "false" }
                         },
-                        ReportItemComments = new List<ReportTemplateItemCommentDto>(),
-                        ReportMedia = new List<ReportTemplateMediaDto>()
+                        ReportItemComments = new List<ReportTemplateItemCommentDto>
+                        {
+                            new() { Text = "" },
+                        },
+                        ReportMedia = new List<ReportTemplateMediaDto>
+                        {
+                            new() { Url = "", Type = "" },
+                        }
                     };
 
                     routineArea.ReportItems.Add(childArea);

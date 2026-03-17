@@ -24,8 +24,8 @@ namespace PropertyInspection.Shared.DTOs
         [Required]
         public Guid InspectorId { get; set; }
 
-        [Required]
-        public string Address { get; set; } = null!;
+        //[Required]
+        //public string Address { get; set; } = null!;
 
         [Required]
         public DateTime InspectionDate { get; set; }

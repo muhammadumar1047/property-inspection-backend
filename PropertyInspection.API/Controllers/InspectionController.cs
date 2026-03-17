@@ -60,7 +60,7 @@ namespace PropertyInspection.API.Controllers
         }
 
         [HttpPost]
-        [Permission("inspection.create")]
+        //[Permission("inspection.create")]
         public async Task<ActionResult<ApiResponse<InspectionResponse>>> Create([FromBody] CreateInspectionRequest inspectionDto)
         {
             var result = await _inspectionService.CreateAsync(inspectionDto);

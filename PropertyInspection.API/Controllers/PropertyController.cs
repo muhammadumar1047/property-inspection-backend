@@ -50,7 +50,7 @@ namespace PropertyInspection.API.Controllers
             return this.ToActionResult(result, new { Count = result.Data?.Data.Count ?? 0 });
         }
 
-        [Permission("property.view")]
+        //[Permission("property.view")]
         [HttpGet("{propertyId}")]
         public async Task<ActionResult<ApiResponse<PropertyResponse>>> GetById(Guid propertyId, Guid? agencyId)
         {
@@ -58,7 +58,7 @@ namespace PropertyInspection.API.Controllers
             return this.ToActionResult(result);
         }
 
-        [Permission("property.create")]
+        //[Permission("property.create")]
         [HttpPost]
         public async Task<ActionResult<ApiResponse<PropertyResponse>>> Create([FromBody] CreatePropertyRequest propertyRequest)
         {
@@ -69,7 +69,7 @@ namespace PropertyInspection.API.Controllers
                 result);
         }
 
-        [Permission("property.update")]
+        //[Permission("property.update")]
         [HttpPut("{propertyId}")]
         public async Task<ActionResult<ApiResponse<bool>>> Update(Guid propertyId, [FromBody] UpdatePropertyRequest propertyRequest)
         {
@@ -77,7 +77,7 @@ namespace PropertyInspection.API.Controllers
             return this.ToActionResult(result);
         }
 
-        [Permission("property.delete")]
+        //[Permission("property.delete")]
         [HttpDelete("{propertyId}")]
         public async Task<ActionResult<ApiResponse<bool>>> Delete(Guid propertyId, Guid? agencyId)
         {

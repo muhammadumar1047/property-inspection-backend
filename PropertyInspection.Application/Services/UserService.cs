@@ -55,18 +55,21 @@ namespace PropertyInspection.Application.Services
                     !u.IsDeleted &&
                     u.AgencyId == tenantAgencyId &&
                     (string.IsNullOrEmpty(filter.Search)
-                        || u.FirstName.Contains(filter.Search)
-                        || u.LastName.Contains(filter.Search)
-                        || u.Email.Contains(filter.Search)) &&
+                        || (u.FirstName ?? string.Empty).Contains(filter.Search)
+                        || (u.LastName ?? string.Empty).Contains(filter.Search)
+                        || (u.Email ?? string.Empty).Contains(filter.Search)) &&
                     (!filter.DepartmentId.HasValue) &&
-                    (!filter.IsActive.HasValue || u.IsDeleted != filter.IsActive.Value) &&
-                    (!filter.RoleId.HasValue || u.UserRoles.Any(ur => ur.RoleId == filter.RoleId));
+                    (!filter.IsActive.HasValue || u.IsActive == filter.IsActive.Value) &&
+                    (!filter.RoleId.HasValue || u.UserRoles.Any(ur => ur.RoleId == filter.RoleId.Value));
 
                 var users = await _unitOfWork.Users.GetAsync(
                     predicate: predicate,
                     include: q => q
+                        .Include(u => u.Agency)
                         .Include(u => u.UserRoles)
-                            .ThenInclude(ur => ur.Role),
+                            .ThenInclude(ur => ur.Role)
+                                .ThenInclude(r => r.RolePermissions)
+                                    .ThenInclude(rp => rp.Permission),
                     orderBy: q => q.OrderBy(u => u.FirstName),
                     skip: skip,
                     take: pageSize
@@ -187,14 +190,15 @@ namespace PropertyInspection.Application.Services
                     LastName = dto.LastName,
                     Email = dto.Email,
                     AgencyId = tenantAgencyId,
-                    CreatedBy = Guid.Parse(_tenant.DomainUserId ?? ""),
-                    CreatedAt = DateTime.UtcNow.Date,
+                    CreatedBy = Guid.Parse(_tenant.DomainUserId ?? Guid.Empty.ToString()),
+                    CreatedAt = DateTime.UtcNow,
                     IsAgencyAdmin = dto.IsAgencyAdmin ?? false,
-                    UserRoles = dto.RoleIds.Distinct().Select(roleId => new UserRole
-                    {
-                        
-                        RoleId = roleId
-                    }).ToList()
+                    UserRoles = (dto.RoleIds ?? new List<Guid>())
+                        .Distinct()
+                        .Select(roleId => new UserRole
+                        {
+                            RoleId = roleId
+                        }).ToList()
                 };
 
                 await _unitOfWork.Users.AddAsync(user);
@@ -248,6 +252,11 @@ namespace PropertyInspection.Application.Services
 
                 user.FirstName = dto.FirstName;
                 user.LastName = dto.LastName;
+
+                if (dto.AgencyId.HasValue)
+                {
+                    user.AgencyId = dto.AgencyId.Value;
+                }
                 user.UpdatedBy = userId;
                 user.UpdatedAt = DateTime.UtcNow;
 

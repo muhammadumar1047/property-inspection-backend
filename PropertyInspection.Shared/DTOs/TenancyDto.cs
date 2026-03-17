@@ -6,7 +6,7 @@ namespace PropertyInspection.Shared.DTOs
 {
     public class TenancyDto : BaseEntityDto
     {
-        public Guid PropertyId { get; set; }
+        public Guid? PropertyId { get; set; }
         public string FullName { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string? Mobile { get; set; }

@@ -12,17 +12,21 @@ namespace PropertyInspection.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ITenantAgencyResolver _tenantAgencyResolver;
 
-        public AnalyticsService(IUnitOfWork unitOfWork, IMapper mapper)
+        public AnalyticsService(IUnitOfWork unitOfWork, IMapper mapper, ITenantAgencyResolver tenantAgencyResolver)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _tenantAgencyResolver = tenantAgencyResolver;
+
         }
 
-        public async Task<ServiceResponse<AnalyticsDto>> GetDashboardAnalyticsByAgencyAsync(Guid agencyId)
+        public async Task<ServiceResponse<AnalyticsDto>> GetDashboardAnalyticsByAgencyAsync(Guid? agencyId)
         {
             try
             {
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
                 var now = DateTime.UtcNow;
                 var startOfThisMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
                 var startOfLastMonth = startOfThisMonth.AddMonths(-1);
@@ -30,27 +34,27 @@ namespace PropertyInspection.Application.Services
 
                 var totalProperties = await _unitOfWork.Properties.CountAsync(p => p.AgencyId == agencyId);
                 var completedThisMonth = await _unitOfWork.Inspections.CountAsync(i =>
-                    i.AgencyId == agencyId &&
+                    i.AgencyId == tenantAgencyId &&
                     i.InspectionStatus == InspectionStatus.Completed &&
                     i.InspectionDate >= startOfThisMonth);
                 var completedLastMonth = await _unitOfWork.Inspections.CountAsync(i =>
-                    i.AgencyId == agencyId &&
+                    i.AgencyId == tenantAgencyId &&
                     i.InspectionStatus == InspectionStatus.Completed &&
                     i.InspectionDate >= startOfLastMonth &&
                     i.InspectionDate <= endOfLastMonth);
 
                 var pendingThisMonth = await _unitOfWork.Inspections.CountAsync(i =>
-                    i.AgencyId == agencyId &&
+                    i.AgencyId == tenantAgencyId &&
                     i.InspectionStatus == InspectionStatus.Pending &&
                     i.InspectionDate >= startOfThisMonth);
                 var pendingLastMonth = await _unitOfWork.Inspections.CountAsync(i =>
-                    i.AgencyId == agencyId &&
+                    i.AgencyId == tenantAgencyId &&
                     i.InspectionStatus == InspectionStatus.Pending &&
                     i.InspectionDate >= startOfLastMonth &&
                     i.InspectionDate <= endOfLastMonth);
 
                 var reportsThisMonth = await _unitOfWork.Reports.CountAsync(r =>
-                    r.AgencyId == agencyId &&
+                    r.AgencyId == tenantAgencyId &&
                     r.CreatedAt >= startOfThisMonth);
                 var reportsLastMonth = await _unitOfWork.Reports.CountAsync(r =>
                     r.AgencyId == agencyId &&
@@ -61,7 +65,7 @@ namespace PropertyInspection.Application.Services
                     last == 0 ? (current > 0 ? 100 : 0) : Math.Round(((double)(current - last) / last) * 100, 2);
 
                 var recentInspectionEntities = await _unitOfWork.Inspections.GetAsync(
-                    predicate: i => i.AgencyId == agencyId,
+                    predicate: i => i.AgencyId == tenantAgencyId,
                     include: q => q.Include(i => i.Property).Include(i => i.Inspector),
                     orderBy: q => q.OrderByDescending(i => i.InspectionDate),
                     take: 5);
@@ -69,7 +73,7 @@ namespace PropertyInspection.Application.Services
 
                 var upcomingInspectionEntities = await _unitOfWork.Inspections.GetAsync(
                     predicate: i =>
-                        i.AgencyId == agencyId &&
+                        i.AgencyId == tenantAgencyId &&
                         i.InspectionDate >= now.Date,
                     include: q => q.Include(i => i.Property).Include(i => i.Inspector),
                     orderBy: q => q.OrderBy(i => i.InspectionDate),
@@ -78,7 +82,7 @@ namespace PropertyInspection.Application.Services
 
                 var monthlyInspectionsRaw = await _unitOfWork.Inspections.GetAsync(
                     predicate: i =>
-                        i.AgencyId == agencyId &&
+                        i.AgencyId == tenantAgencyId &&
                         i.InspectionDate >= startOfThisMonth.AddMonths(-11),
                     orderBy: q => q.OrderBy(i => i.InspectionDate));
 

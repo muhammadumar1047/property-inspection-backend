@@ -12,7 +12,7 @@ using PropertyInspection.Infrastructure.Data;
 namespace PropertyInspection.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260312042329_InitialCreate")]
+    [Migration("20260312095208_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

@@ -4,6 +4,7 @@ using System.Linq;
 using PropertyInspection.Core.Entities;
 using PropertyInspection.Shared.Auth;
 using PropertyInspection.Shared.DTOs;
+using PropertyInspection.Shared.DTOs;
 
 namespace PropertyInspection.Application.Mapping
 {
@@ -50,12 +51,22 @@ namespace PropertyInspection.Application.Mapping
             CreateMap<DefaultWhitelabelDto, WhitelabelReportSettingsDto>();
 
             // Users
+            CreateMap<Permission, PermissionDto>();
+
             CreateMap<UserRole, UserRoleDto>()
                 .ForMember(d => d.Id, opt => opt.MapFrom(s => s.RoleId))
-                .ForMember(d => d.RoleName, opt => opt.MapFrom(s => s.Role != null ? s.Role.Name : string.Empty));
+                .ForMember(d => d.RoleName, opt => opt.MapFrom(s => s.Role != null ? s.Role.Name : string.Empty))
+                .ForMember(d => d.Permissions, opt => opt.MapFrom(s =>
+                    s.Role != null
+                        ? s.Role.RolePermissions.Select(rp => rp.Permission)
+                        : Enumerable.Empty<Permission>()));
+
             CreateMap<User, UserResponse>()
                 .ForMember(d => d.AgencyName, opt => opt.MapFrom(s => s.Agency != null ? s.Agency.LegalBusinessName : null))
                 .ForMember(d => d.UserRoles, opt => opt.MapFrom(s => s.UserRoles));
+
+            // Roles
+            CreateMap<Role, RoleDto>();
 
             // Property layout
             CreateMap<PropertyLayout, PropertyLayoutResponse>()
@@ -68,9 +79,15 @@ namespace PropertyInspection.Application.Mapping
                 .ForMember(d => d.Areas, opt => opt.MapFrom(s => s.LayoutArea));
             CreateMap<UpdatePropertyLayoutRequest, PropertyLayout>()
                 .ForMember(d => d.Areas, opt => opt.MapFrom(s => s.LayoutArea));
+
             CreateMap<CreateLayoutAreaRequest, LayoutArea>()
                 .ForMember(d => d.Items, opt => opt.MapFrom(s => s.LayoutItem));
             CreateMap<CreateLayoutItemRequest, LayoutItem>();
+
+            // Update layout mappings (nested collections)
+            CreateMap<UpdateLayoutAreaRequest, LayoutArea>()
+                .ForMember(d => d.Items, opt => opt.MapFrom(s => s.LayoutItem));
+            CreateMap<UpdateLayoutItemRequest, LayoutItem>();
 
             // Property
             CreateMap<Property, PropertyResponse>()

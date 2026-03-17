@@ -22,20 +22,20 @@ namespace PropertyInspection.API.Controllers
         }
 
         [HttpGet]
-        [Permission("report.view")]
-        public async Task<ActionResult<ApiResponse<AnalyticsDto>>> GetAnalytics()
+        //[Permission("report.view")]
+        public async Task<ActionResult<ApiResponse<AnalyticsDto>>> GetAnalytics(Guid? agencyId)
         {
-            if (!HttpContext.Items.ContainsKey("AgencyId") || HttpContext.Items["AgencyId"] == null)
-            {
-                return this.ToActionResult(new ServiceResponse<AnalyticsDto>
-                {
-                    Success = false,
-                    Message = "Invalid request data",
-                    ErrorCode = ServiceErrorCodes.InvalidRequest
-                });
-            }
+            //if (!HttpContext.Items.ContainsKey("AgencyId") || HttpContext.Items["AgencyId"] == null)
+            //{
+            //    return this.ToActionResult(new ServiceResponse<AnalyticsDto>
+            //    {
+            //        Success = false,
+            //        Message = "Invalid request data",
+            //        ErrorCode = ServiceErrorCodes.InvalidRequest
+            //    });
+            //}
 
-            Guid agencyId = Guid.Parse(HttpContext.Items["AgencyId"]?.ToString() ?? Guid.Empty.ToString());
+            //Guid agencyId = Guid.Parse(HttpContext.Items["AgencyId"]?.ToString() ?? Guid.Empty.ToString());
 
             var result = await _analyticsService.GetDashboardAnalyticsByAgencyAsync(agencyId);
             return this.ToActionResult(result);
