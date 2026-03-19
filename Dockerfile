@@ -9,6 +9,7 @@ COPY PropertyInspection.Application/PropertyInspection.Application.csproj Proper
 COPY PropertyInspection.Core/PropertyInspection.Core.csproj PropertyInspection.Core/
 COPY PropertyInspection.Infrastructure/PropertyInspection.Infrastructure.csproj PropertyInspection.Infrastructure/
 COPY PropertyInspection.Shared/PropertyInspection.Shared.csproj PropertyInspection.Shared/
+COPY PropertyInspection.Tests/PropertyInspection.Tests.csproj PropertyInspection.Tests/
 
 RUN dotnet restore PropertyInspection.SaaS.sln
 
