@@ -1,7 +1,7 @@
 services:
   backend:
     build:
-      context: ./backend
+      context: ./property-inspection-backend
     container_name: backend
     restart: unless-stopped
     ports:
