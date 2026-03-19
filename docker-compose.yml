@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: ./property-inspection-backend
-    container_name: backend
+    container_name: property-inspection-backend
     restart: unless-stopped
     ports:
       - "5000:80"
