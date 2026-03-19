@@ -1,10 +1,14 @@
+version: "3.9"
+
 services:
   backend:
     build:
       context: ./property-inspection-backend
-    container_name: property-inspection-backend
+      dockerfile: Dockerfile
+    container_name: backend
     restart: unless-stopped
     ports:
       - "5000:80"
     environment:
-      - ConnectionStrings__Default=Host=ec2-52-62-164-129.ap-southeast-2.compute.amazonaws.com;Port=5432;Database=propertydb;Username=postgres;Password=postgres
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__Default=Host=localhost;Port=5433;Database=propertydb;Username=postgres;Password=postgres
