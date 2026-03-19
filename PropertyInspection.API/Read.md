@@ -27,6 +27,13 @@ dotnet ef migrations add UpdateLookupEntities -p ..\PropertyInspection.Infrastru
 
 
 
+dotnet ef migrations add UpdateMediaType -p ..\PropertyInspection.Infrastructure -s . -c AppDbContext -o Migrations
+
+
+dotnet ef migrations add UpdateReportStructure -p ..\PropertyInspection.Infrastructure -s . -c AppDbContext -o Migrations
+
+
+
 
 
 

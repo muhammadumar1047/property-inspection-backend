@@ -1,3 +1,5 @@
+using Amazon;
+using Amazon.Runtime;
 using Amazon.S3;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -69,6 +71,18 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserAuthService, IdentityAuthService>();
 builder.Services.AddScoped<IAgencyRoleProvisioningService, RoleSeeder>();
+var awsOptions = builder.Configuration.GetAWSOptions();
+var awsSettings = builder.Configuration.GetSection("AWS").Get<AwsSettings>();
+if (!string.IsNullOrWhiteSpace(awsSettings?.Region))
+{
+    awsOptions.Region = RegionEndpoint.GetBySystemName(awsSettings.Region);
+}
+if (!string.IsNullOrWhiteSpace(awsSettings?.AccessKey) &&
+    !string.IsNullOrWhiteSpace(awsSettings?.SecretKey))
+{
+    awsOptions.Credentials = new BasicAWSCredentials(awsSettings.AccessKey, awsSettings.SecretKey);
+}
+builder.Services.AddDefaultAWSOptions(awsOptions);
 builder.Services.AddAWSService<IAmazonS3>();
 
 builder.Services.AddScoped<IAgencyService, AgencyService>();
@@ -80,11 +94,15 @@ builder.Services.AddScoped<IPropertyLayoutService, PropertyLayoutService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IReportSyncService, ReportSyncService>();
 builder.Services.AddScoped<IReportTemplateService, ReportTemplateService>();
+builder.Services.AddScoped<IMobileReportTemplateService, MobileReportTemplateService>();
 builder.Services.AddScoped<IS3Service, S3Service>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<ILookupService, LookupService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IMobileDashboardService, MobileDashboardService>();
+builder.Services.AddScoped<IMobileProfileService, ProfileService>();
+builder.Services.AddScoped<IMobileInspectionService, MobileInspectionService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
@@ -139,5 +157,6 @@ app.UseAuthorization();
 app.UseMiddleware<TenantContextMiddleware>();
 
 app.MapControllers();
+app.MapGet("/health", () => Results.Ok("ok"));
 
 app.Run();

@@ -52,7 +52,8 @@ namespace PropertyInspection.Application.Services
                             ReportItemConditions = itemDto.ReportItemConditions?.Select(c => new ReportItemCondition
                             {
                                 Description = c.Description,
-                                Value = c.Value
+                                Type = c.Type ?? string.Empty,
+                                Value = c.Value?.ToString(),
                             }).ToList() ?? new List<ReportItemCondition>(),
                             ReportItemComments = itemDto.ReportItemComments?.Select(c => new ReportItemComment
                             {

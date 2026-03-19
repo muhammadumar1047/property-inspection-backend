@@ -21,14 +21,14 @@ namespace PropertyInspection.API.Controllers
         [HttpGet("GenerateReportTemplateForPCR")]
         public async Task<ActionResult<ApiResponse<ReportTemplateDto>>> GenerateReportTemplateForPCR(Guid inspectionId)
         {
-            var result = await _reportTemplateService.GenerateReportTemplateForPCR(inspectionId);
+            var result = await _reportTemplateService.GenerateEntryExitTemplateAsync(inspectionId);
             return this.ToActionResult(result);
         }
 
         [HttpGet("GenerateReportTemplateForRoutine")]
         public async Task<ActionResult<ApiResponse<ReportTemplateDto>>> GenerateReportTemplateForRoutine(Guid inspectionId)
         {
-            var result = await _reportTemplateService.GenerateReportTemplateForRoutine(inspectionId);
+            var result = await _reportTemplateService.GenerateRoutineTemplateAsync(inspectionId);
             return this.ToActionResult(result);
         }
     }

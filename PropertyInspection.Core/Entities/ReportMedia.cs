@@ -18,7 +18,7 @@ namespace PropertyInspection.Core.Entities
         public string Url { get; set; } = null!;
 
         [Required]
-        public MediaType Type { get; set; } = MediaType.Photo;
+        public string Type { get; set; } = "";
 
         // Navigation
         [ForeignKey(nameof(ReportItemId))]

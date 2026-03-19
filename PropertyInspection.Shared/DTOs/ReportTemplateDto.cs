@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PropertyInspection.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,7 +38,8 @@ namespace PropertyInspection.Shared.DTOs
         public Guid ReportItemConditionId { get; set; }
         public Guid ReportItemId { get; set; }
         public string Description { get; set; } = string.Empty;
-        public string Value { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public object? Value { get; set; }
     }
 
     public class ReportTemplateItemCommentDto
@@ -52,7 +54,7 @@ namespace PropertyInspection.Shared.DTOs
         public Guid ReportMediaId { get; set; }
         public Guid ReportItemId { get; set; }
         public string Url { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
+        public string Type { get; set; }
         public List<ReportTemplateMediaCommentDto> ReportMediaComments { get; set; } = new();
     }
 

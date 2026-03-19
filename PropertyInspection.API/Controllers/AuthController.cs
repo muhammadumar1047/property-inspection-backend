@@ -8,7 +8,7 @@ using PropertyInspection.Shared.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace PropertyInspection.API.Controllers
+namespace PropertyInspection.API.Controllaers
 {
     [Route("api/[controller]")]
     [ApiController]

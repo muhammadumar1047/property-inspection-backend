@@ -15,6 +15,9 @@ namespace PropertyInspection.Core.Entities
 
         [Required, StringLength(500)]
         public string Description { get; set; } = null!;
+
+        [Required, StringLength(50)]
+        public string Type { get; set; } = null!;
             
         [StringLength(500)]
         public string? Value { get; set; }

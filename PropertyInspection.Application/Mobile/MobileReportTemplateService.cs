@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PropertyInspection.Application.Factories;
 using PropertyInspection.Application.IServices;
 using PropertyInspection.Core.Entities;
@@ -9,11 +9,11 @@ using PropertyInspection.Shared.DTOs;
 
 namespace PropertyInspection.Application.Services
 {
-    public class ReportTemplateService : IReportTemplateService
+    public class MobileReportTemplateService :IMobileReportTemplateService
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public ReportTemplateService(IUnitOfWork unitOfWork)
+        public MobileReportTemplateService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -258,3 +258,4 @@ namespace PropertyInspection.Application.Services
         }
     }
 }
+
