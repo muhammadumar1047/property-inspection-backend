@@ -3,7 +3,7 @@ version: "3.9"
 services:
   backend:
     build:
-      context: ./PropertyInspection.API
+      context: .
       dockerfile: Dockerfile
     container_name: backend
     restart: unless-stopped
