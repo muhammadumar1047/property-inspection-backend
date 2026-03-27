@@ -142,7 +142,7 @@ namespace PropertyInspection.Application.Services
         {
             var template = new ReportTemplateDto
             {
-                ReportId = Guid.Empty,
+                //ReportId = Guid.Empty,
                 InspectionId = inspection.Id,
                 ReportType = inspection.InspectionType.ToString(),
                 Notes = string.Empty,
@@ -157,7 +157,7 @@ namespace PropertyInspection.Application.Services
                 {
                     var areaDto = new ReportTemplateAreaDto
                     {
-                        ReportAreaId = Guid.Empty,
+                        //ReportAreaId = Guid.Empty,
                         Name = layoutArea.AreaName,
                         ReportItems = layoutArea.Items.Select(item => new ReportTemplateItemDto
                         {
@@ -168,11 +168,13 @@ namespace PropertyInspection.Application.Services
                                 new() { Description = "Undamaged", Type = "boolean", Value = null },
                                 new() { Description = "Working", Type = "boolean", Value = null }
                             },
-                            ReportItemComments = new List<ReportTemplateItemCommentDto>
-                            {
-                                new() { Text = string.Empty },
-                            },
-                            ReportMedia = CreateDefaultMedia()
+                            ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                            //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                            //{
+                            //    new() { Text = string.Empty },
+                            //},
+                            ReportMedia = new List<ReportTemplateMediaDto>()
+                            //ReportMedia = CreateDefaultMedia()
                         }).ToList()
                     };
 
@@ -180,7 +182,7 @@ namespace PropertyInspection.Application.Services
                 }
             }
 
-            EnsureMediaPlaceholders(template);
+            //EnsureMediaPlaceholders(template);
             return template;
         }
 
@@ -188,7 +190,7 @@ namespace PropertyInspection.Application.Services
         {
             var template = new ReportTemplateDto
             {
-                ReportId = Guid.Empty,
+                //ReportId = Guid.Empty,
                 InspectionId = inspection.Id,
                 ReportType = "Routine",
                 Notes = string.Empty,
@@ -199,7 +201,7 @@ namespace PropertyInspection.Application.Services
 
             var routineArea = new ReportTemplateAreaDto
             {
-                ReportAreaId = Guid.Empty,
+                //ReportAreaId = Guid.Empty,
                 Name = "Routine Inspection",
                 ReportItems = new List<ReportTemplateItemDto>()
             };
@@ -210,7 +212,7 @@ namespace PropertyInspection.Application.Services
                 {
                     var childArea = new ReportTemplateItemDto
                     {
-                        ReportItemId = Guid.Empty,
+                        //ReportItemId = Guid.Empty,
                         Name = layoutArea.AreaName,
                         ReportItemConditions = new List<ReportTemplateItemConditionDto>
                         {

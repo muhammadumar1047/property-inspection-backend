@@ -1,10 +1,13 @@
+﻿using PropertyInspection.Core.Enums;
 using System;
-using PropertyInspection.Core.Enums;
-using PropertyInspection.Shared.Auth;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace PropertyInspection.Shared.DTOs
 {
-    public class InspectionResponse
+    public class ReportInspectionResponse
     {
         public Guid Id { get; set; }
         public Guid AgencyId { get; set; }
@@ -17,12 +20,7 @@ namespace PropertyInspection.Shared.DTOs
         public InspectionStatus InspectionStatus { get; set; }
         public DateTime InspectionDate { get; set; }
         public TimeSpan InspectionTime { get; set; }
-        public PropertyResponse? Property { get; set; }
-        public AgencyResponse? Agency { get; set; }
-        public UserResponse? Inspector { get; set; }
-        public bool isActive { get; set; }
-        public List<LandlordSnapshotDto>? LandlordSnapshots { get; set; }
-        public List<TenancySnapshotDto>? TenancySnapshots { get; set; }
+
+
     }
 }
-

@@ -10,7 +10,6 @@ namespace PropertyInspection.Shared.DTOs
         public string ReportType { get; set; } = null!;
         public string? Notes { get; set; }
 
-        [JsonIgnore]
         public InspectionResponse? Inspection { get; set; }
 
         public List<ReportAreaDto> ReportAreas { get; set; } = new();

@@ -15,7 +15,7 @@ namespace PropertyInspection.Application.Factories
             //Property Condition Report (PCR) - Utilities Area Template
             return new ReportTemplateAreaDto
             {
-                ReportAreaId = Guid.Empty,
+                //ReportAreaId = Guid.Empty,
                 Name = "Utilities",
                 ReportItems = new List<ReportTemplateItemDto>
             {
@@ -27,14 +27,17 @@ namespace PropertyInspection.Application.Factories
                         new() { Description = "Telephone line connected", Type = "boolean", Value = null },
                         new() { Description = "Internet line connected", Type = "boolean", Value = null }
                     },
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+
+                    ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
                 },
                 new ReportTemplateItemDto
                 {
@@ -49,14 +52,16 @@ namespace PropertyInspection.Application.Factories
                         new() { Description = "Water Meter Location", Type = "text", Value = null },
                         new() { Description = "Water Meter Reading", Type = "number", Value = null }
                     },
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
                 },
                 new ReportTemplateItemDto
                 {
@@ -69,14 +74,16 @@ namespace PropertyInspection.Application.Factories
                         new() { Description = "Loose-Fill Asbestos listed", Type = "boolean", Value = null },
                         new() { Description = "Child safety devices installed", Type = "boolean", Value = null },
                     },
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                     ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
@@ -89,14 +96,16 @@ namespace PropertyInspection.Application.Factories
                         new() { Description = "Flooring laid/replaced/cleaned", Type = "boolean", Value = null },
                         new() { Description = "Smoke alarm installation/repair", Type = "boolean", Value = null },
                     },
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                    ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
@@ -109,14 +118,16 @@ namespace PropertyInspection.Application.Factories
                         new() { Description = "Tenant agrees with Other Safety Issues", Type = "boolean", Value = null },
                         new() { Description = "Disagreement Details", Type = "text", Value = null },
                     },
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                     ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
@@ -131,14 +142,16 @@ namespace PropertyInspection.Application.Factories
                         new() { Description = "Last Battery Change Date", Type = "date", Value = null },
                         new() { Description = "Smoke alarm comments", Type = "text", Value = null },
                     },
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                    ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
@@ -157,14 +170,16 @@ namespace PropertyInspection.Application.Factories
                         new() { Description = "Tenant agrees with Minimum Standards", Type = "boolean", Value = null },
                         new() { Description = "Disagreement Details", Type = "text", Value = null },
                     },
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                    ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
@@ -173,14 +188,16 @@ namespace PropertyInspection.Application.Factories
                     {
                         new() { Description = "Additional Comments", Type = "text", Value = null },
                     },
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                    ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
@@ -189,14 +206,16 @@ namespace PropertyInspection.Application.Factories
                     {
                         new() { Description = "Furniture", Type = "text", Value = null },
                     },
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                    ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
@@ -205,14 +224,16 @@ namespace PropertyInspection.Application.Factories
                     {
                         new() { Description = "Custom Notes", Type = "text", Value = null },
                     },
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                    ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
             }
             };
@@ -224,7 +245,7 @@ namespace PropertyInspection.Application.Factories
 
             return new ReportTemplateAreaDto
             {
-                ReportAreaId = Guid.Empty,
+                //ReportAreaId = Guid.Empty,
                 Name = "RoutineInspectionSummary",
                 ReportItems = new List<ReportTemplateItemDto>
             {

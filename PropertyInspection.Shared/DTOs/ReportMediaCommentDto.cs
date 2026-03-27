@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Text.Json.Serialization;
 using PropertyInspection.Core.Enums;
 
 namespace PropertyInspection.Shared.DTOs
@@ -10,6 +11,8 @@ namespace PropertyInspection.Shared.DTOs
         public string Text { get; set; } = null!;
         public decimal? X { get; set; }
         public decimal? Y { get; set; }
+
+        [JsonIgnore]
         public ReportMediaDto? ReportMedia { get; set; }
     }
 }

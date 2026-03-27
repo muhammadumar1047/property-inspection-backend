@@ -9,7 +9,7 @@ namespace PropertyInspection.Shared.DTOs
 {
     public class ReportTemplateDto
     {
-        public Guid ReportId { get; set; }
+        //public Guid ReportId { get; set; }
         public Guid InspectionId { get; set; }
         public string ReportType { get; set; } = string.Empty;
         public string Notes { get; set; } = string.Empty;
@@ -19,14 +19,14 @@ namespace PropertyInspection.Shared.DTOs
 
     public class ReportTemplateAreaDto
     {
-        public Guid ReportAreaId { get; set; }
+        //public Guid ReportAreaId { get; set; }
         public string Name { get; set; } = string.Empty;
         public List<ReportTemplateItemDto> ReportItems { get; set; } = new();
     }
 
     public class ReportTemplateItemDto
     {
-        public Guid ReportItemId { get; set; }
+        //public Guid ReportItemId { get; set; }
         public string Name { get; set; } = string.Empty;
         public List<ReportTemplateItemConditionDto> ReportItemConditions { get; set; } = new();
         public List<ReportTemplateItemCommentDto> ReportItemComments { get; set; } = new();
@@ -35,8 +35,8 @@ namespace PropertyInspection.Shared.DTOs
 
     public class ReportTemplateItemConditionDto
     {
-        public Guid ReportItemConditionId { get; set; }
-        public Guid ReportItemId { get; set; }
+        //public Guid ReportItemConditionId { get; set; }
+        //public Guid ReportItemId { get; set; }
         public string Description { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
         public object? Value { get; set; }
@@ -44,15 +44,15 @@ namespace PropertyInspection.Shared.DTOs
 
     public class ReportTemplateItemCommentDto
     {
-        public Guid ReportItemCommentId { get; set; }
-        public Guid ReportItemId { get; set; }
+        //public Guid ReportItemCommentId { get; set; }
+        //public Guid ReportItemId { get; set; }
         public string Text { get; set; } = string.Empty;
     }
 
     public class ReportTemplateMediaDto
     {
-        public Guid ReportMediaId { get; set; }
-        public Guid ReportItemId { get; set; }
+        //public Guid ReportMediaId { get; set; }
+        //public Guid ReportItemId { get; set; }
         public string Url { get; set; } = string.Empty;
         public string Type { get; set; }
         public List<ReportTemplateMediaCommentDto> ReportMediaComments { get; set; } = new();
@@ -60,8 +60,8 @@ namespace PropertyInspection.Shared.DTOs
 
     public class ReportTemplateMediaCommentDto
     {
-        public Guid ReportMediaCommentId { get; set; }
-        public Guid ReportMediaId { get; set; }
+        //public Guid ReportMediaCommentId { get; set; }
+        //public Guid ReportMediaId { get; set; }
         public string Text { get; set; } = string.Empty;
         public decimal? X { get; set; }
         public decimal? Y { get; set; }
