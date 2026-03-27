@@ -64,6 +64,23 @@ namespace PropertyInspection.API.Controllers
             var result = await _userService.DeleteAsync(id, userId);
             return this.ToActionResult(result);
         }
+
+        [HttpGet("me")]
+        public async Task<ActionResult<ApiResponse<UserResponse>>> GetCurrentUser(Guid? agencyId)
+        {
+            if (!Guid.TryParse(User.GetDomainUserId(), out var userId))
+            {
+                return Unauthorized(new ApiResponse<UserResponse>
+                {
+                    Success = false,
+                    Message = "Invalid token. Please login again."
+                });
+            }
+            var result = await _userService.GetByIdAsync(userId);
+            return this.ToActionResult(result);
+
+
+        }
     }
 }
 

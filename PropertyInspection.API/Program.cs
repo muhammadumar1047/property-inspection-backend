@@ -110,29 +110,29 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowFrontend", policy =>
-//    {
-//        policy
-//            .WithOrigins("http://localhost:3000") // frontend origin
-//            .AllowAnyMethod()
-//            .AllowAnyHeader()
-//            .AllowCredentials(); // must if frontend uses withCredentials
-//    });
-//});
-
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-        builder =>
-        {
-            builder.WithOrigins("http://ec2-52-62-164-129.ap-southeast-2.compute.amazonaws.com:3000")
-                   .AllowAnyHeader()
-                   .AllowAnyMethod()
-                   .AllowCredentials(); // SignalR ke liye
-        });
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:3000") // frontend origin
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials(); // must if frontend uses withCredentials
+    });
 });
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowFrontend",
+//        builder =>
+//        {
+//            builder.WithOrigins("http://ec2-52-62-164-129.ap-southeast-2.compute.amazonaws.com:3000")
+//                   .AllowAnyHeader()
+//                   .AllowAnyMethod()
+//                   .AllowCredentials(); // SignalR ke liye
+//        });
+//});
 
 
 builder.Services.AddSignalR();
