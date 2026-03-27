@@ -24,6 +24,13 @@ namespace PropertyInspection.API.Controllers
             return this.ToActionResult(result, new { Count = result.Data?.Data.Count ?? 0 });
         }
 
+        [HttpGet("active")]
+        public async Task<ActionResult<ApiResponse<IReadOnlyList<BillingDto>>>> GetActiveBillingPlans()
+        {
+            var result = await _billingService.GetActiveBillingPlansAsync();
+            return this.ToActionResult(result, new { Count = result.Data?.Count ?? 0 });
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse<BillingDto>>> GetBilling(Guid id)
         {

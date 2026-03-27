@@ -44,6 +44,9 @@ namespace PropertyInspection.Core.Entities
         [StringLength(200)] public string? TechnicalContactFaxNumber { get; set; }
         [StringLength(100)] public string? TechnicalContactEmail { get; set; }
 
+        public Guid? BillingPlanId { get; set; }
+        public Billing? BillingPlan { get; set; }
+
         public AgencyWhitelabel AgencyWhitelabel { get; set; } = null!;
         public ICollection<Property> Properties { get; set; } = new List<Property>();
         public ICollection<User> Users { get; set; } = new List<User>();

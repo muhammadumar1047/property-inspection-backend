@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using PropertyInspection.Shared;
 using PropertyInspection.Shared.DTOs;
@@ -12,7 +13,11 @@ namespace PropertyInspection.Application.IServices
         Task<ServiceResponse<bool>> DeleteBillingAsync(Guid id);
         Task<ServiceResponse<bool>> ActivateBillingAsync(Guid id);
         Task<ServiceResponse<bool>> DeactivateBillingAsync(Guid id);
+        Task<ServiceResponse<IReadOnlyList<BillingDto>>> GetActiveBillingPlansAsync();
         Task<ServiceResponse<BillingDto>> GetBillingByIdAsync(Guid id);
         Task<ServiceResponse<PagedResult<BillingDto>>> GetBillingsAsync(BillingFilterDto filter);
     }
 }
+
+
+

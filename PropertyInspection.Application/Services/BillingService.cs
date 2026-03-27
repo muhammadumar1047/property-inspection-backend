@@ -236,7 +236,36 @@ namespace PropertyInspection.Application.Services
             return await SetBillingActiveStateAsync(id, false, "Billing plan deactivated successfully");
         }
 
-        public async Task<ServiceResponse<BillingDto>> GetBillingByIdAsync(Guid id)
+                public async Task<ServiceResponse<IReadOnlyList<BillingDto>>> GetActiveBillingPlansAsync()
+        {
+            try
+            {
+                var plans = await _billingRepository.GetAsync(
+                    predicate: b => !b.IsDeleted && b.IsActive,
+                    include: q => q.Include(b => b.Features),
+                    orderBy: q => q.OrderBy(b => b.Name));
+
+                var dtos = _mapper.Map<List<BillingDto>>(plans);
+
+                return new ServiceResponse<IReadOnlyList<BillingDto>>
+                {
+                    Success = true,
+                    Message = "Records retrieved successfully",
+                    Data = dtos
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving active billing plans");
+                return new ServiceResponse<IReadOnlyList<BillingDto>>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+public async Task<ServiceResponse<BillingDto>> GetBillingByIdAsync(Guid id)
         {
             try
             {
@@ -420,3 +449,4 @@ namespace PropertyInspection.Application.Services
         }
     }
 }
+

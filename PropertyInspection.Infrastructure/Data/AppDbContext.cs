@@ -93,6 +93,13 @@ namespace PropertyInspection.Infrastructure.Data
                 .HasForeignKey(a => a.TimeZoneId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Billing Plan relationship
+            builder.Entity<Agency>()
+                .HasOne(a => a.BillingPlan)
+                .WithMany()
+                .HasForeignKey(a => a.BillingPlanId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             #endregion
         }
     }

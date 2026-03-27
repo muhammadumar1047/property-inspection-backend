@@ -54,6 +54,9 @@ namespace PropertyInspection.Shared.DTOs
         public string? TechnicalContactJobTitle { get; set; }
         public string? TechnicalContactFaxNumber { get; set; }
         public string? TechnicalContactEmail { get; set; }
+
+        [Required]
+        public Guid? BillingPlanId { get; set; }
     }
 
 }

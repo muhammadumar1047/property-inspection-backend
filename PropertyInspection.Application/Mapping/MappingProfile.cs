@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using System;
 using System.Linq;
 using PropertyInspection.Core.Entities;
@@ -19,7 +19,8 @@ namespace PropertyInspection.Application.Mapping
             CreateMap<TimeZoneLookup, TimeZoneLookupDto>();
 
             // Agency mappings
-            CreateMap<Agency, AgencyResponse>();
+            CreateMap<Agency, AgencyResponse>()
+                .ForMember(d => d.BillingPlanName, opt => opt.MapFrom(s => s.BillingPlan != null ? s.BillingPlan.Name : null));
             CreateMap<CreateAgencyRequest, Agency>()
                 .ForMember(d => d.CountryId, opt => opt.MapFrom(s => s.CountryId!.Value))
                 .ForMember(d => d.StateId, opt => opt.MapFrom(s => s.StateId!.Value))
@@ -222,4 +223,6 @@ namespace PropertyInspection.Application.Mapping
         }
     }
 }
+
+
 

@@ -36,6 +36,8 @@ dotnet ef migrations add UpdateReportStructure -p ..\PropertyInspection.Infrastr
 dotnet ef migrations add AddBillingPlanFeature -p ..\PropertyInspection.Infrastructure -s . -c AppDbContext -o Migrations
 
 
+dotnet ef migrations add AddBillingPlanInAgency -p ..\PropertyInspection.Infrastructure -s . -c AppDbContext -o Migrations
+
 
 
 

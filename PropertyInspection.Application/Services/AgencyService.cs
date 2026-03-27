@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PropertyInspection.Application.IServices;
 using PropertyInspection.Core.Authorization;
@@ -62,6 +62,7 @@ namespace PropertyInspection.Application.Services
                         .Include(a => a.AgencyWhitelabel)
                         .Include(a => a.Country)
                         .Include(a => a.State)
+                        .Include(a => a.BillingPlan)
                         .AsNoTracking(),
                     orderBy: q => q.OrderBy(a => a.LegalBusinessName)
                 );
@@ -99,7 +100,9 @@ namespace PropertyInspection.Application.Services
             {
                 var agency = await _unitOfWork.Agencies.FirstOrDefaultAsync(
                     a => a.Id == agencyId,
-                    include: query => query.Include(a => a.AgencyWhitelabel).AsNoTracking()
+                    include: query => query.Include(a => a.AgencyWhitelabel)
+                        .Include(a => a.BillingPlan)
+                        .AsNoTracking()
                 );
 
                 if (agency == null)
@@ -144,7 +147,31 @@ namespace PropertyInspection.Application.Services
                     };
                 }
 
+                if (!dto.BillingPlanId.HasValue)
+                {
+                    return new ServiceResponse<AgencyResponse>
+                    {
+                        Success = false,
+                        Message = "Billing plan is required",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    };
+                }
+
+                var billingPlan = await _unitOfWork.Billings.FirstOrDefaultAsync(b =>
+                    b.Id == dto.BillingPlanId && b.IsActive && !b.IsDeleted);
+
+                if (billingPlan == null)
+                {
+                    return new ServiceResponse<AgencyResponse>
+                    {
+                        Success = false,
+                        Message = "Selected billing plan is invalid or inactive",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    };
+                }
+
                 var agency = _mapper.Map<Agency>(dto);
+                agency.BillingPlanId = billingPlan.Id;
                 agency.CreatedAt = DateTime.UtcNow;
                 agency.UpdatedAt = DateTime.UtcNow;
 
@@ -271,7 +298,28 @@ namespace PropertyInspection.Application.Services
                     };
                 }
 
+                var resolvedBillingPlanId = existingAgency.BillingPlanId;
+
+                if (dto.BillingPlanId.HasValue)
+                {
+                    var billingPlan = await _unitOfWork.Billings.FirstOrDefaultAsync(b =>
+                        b.Id == dto.BillingPlanId && b.IsActive && !b.IsDeleted);
+
+                    if (billingPlan == null)
+                    {
+                        return new ServiceResponse<AgencyResponse>
+                        {
+                            Success = false,
+                            Message = "Selected billing plan is invalid or inactive",
+                            ErrorCode = ServiceErrorCodes.InvalidRequest
+                        };
+                    }
+
+                    resolvedBillingPlanId = billingPlan.Id;
+                }
+
                 _mapper.Map(dto, existingAgency);
+                existingAgency.BillingPlanId = resolvedBillingPlanId;
                 existingAgency.UpdatedAt = DateTime.UtcNow;
 
                 await _unitOfWork.Agencies.UpdateAsync(existingAgency);
@@ -334,4 +382,9 @@ namespace PropertyInspection.Application.Services
         }
     }
 }
+
+
+
+
+
 
