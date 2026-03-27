@@ -22,22 +22,23 @@ namespace PropertyInspection.API.Controllers
         }
 
         [HttpGet]
-        //[Permission("report.view")]
         public async Task<ActionResult<ApiResponse<AnalyticsDto>>> GetAnalytics(Guid? agencyId)
         {
-            //if (!HttpContext.Items.ContainsKey("AgencyId") || HttpContext.Items["AgencyId"] == null)
-            //{
-            //    return this.ToActionResult(new ServiceResponse<AnalyticsDto>
-            //    {
-            //        Success = false,
-            //        Message = "Invalid request data",
-            //        ErrorCode = ServiceErrorCodes.InvalidRequest
-            //    });
-            //}
-
-            //Guid agencyId = Guid.Parse(HttpContext.Items["AgencyId"]?.ToString() ?? Guid.Empty.ToString());
-
             var result = await _analyticsService.GetDashboardAnalyticsByAgencyAsync(agencyId);
+            return this.ToActionResult(result);
+        }
+
+        [HttpGet("summary")]
+        public async Task<ActionResult<ApiResponse<AnalyticsSummaryDto>>> GetSummary([FromQuery] AnalyticsFilterDto filter)
+        {
+            var result = await _analyticsService.GetAnalyticsSummaryAsync(filter);
+            return this.ToActionResult(result);
+        }
+
+        [HttpGet("charts")]
+        public async Task<ActionResult<ApiResponse<AnalyticsChartDto>>> GetCharts([FromQuery] AnalyticsFilterDto filter)
+        {
+            var result = await _analyticsService.GetAnalyticsChartsAsync(filter);
             return this.ToActionResult(result);
         }
     }
