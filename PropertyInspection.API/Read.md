@@ -33,6 +33,10 @@ dotnet ef migrations add UpdateMediaType -p ..\PropertyInspection.Infrastructure
 dotnet ef migrations add UpdateReportStructure -p ..\PropertyInspection.Infrastructure -s . -c AppDbContext -o Migrations
 
 
+dotnet ef migrations add AddBillingPlanFeature -p ..\PropertyInspection.Infrastructure -s . -c AppDbContext -o Migrations
+
+
+
 
 
 

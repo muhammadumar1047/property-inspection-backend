@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PropertyInspection.Core.Entities;
 using PropertyInspection.Infrastructure.Auth;
@@ -57,6 +57,8 @@ namespace PropertyInspection.Infrastructure.Data
         public DbSet<CountryLookup> CountryLookups { get; set; }
         public DbSet<StateLookup> StateLookups { get; set; }
         public DbSet<TimeZoneLookup> TimeZoneLookups { get; set; }
+        public DbSet<Billing> Billings { get; set; }
+        public DbSet<BillingFeature> BillingFeatures { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder builder)

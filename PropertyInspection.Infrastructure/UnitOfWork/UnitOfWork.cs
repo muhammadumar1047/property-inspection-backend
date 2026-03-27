@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore.Storage;
 using PropertyInspection.Core.Entities;
 using PropertyInspection.Core.Interfaces.Repositories;
 using PropertyInspection.Core.Interfaces.UnitOfWork;
@@ -42,6 +42,7 @@ namespace PropertyInspection.Infrastructure.UnitOfWork
         private IGenericRepository<RolePermission>? _rolePermissions;
         private IGenericRepository<Notification>? _notification;
         private IGenericRepository<NotificationRecipient>? _notificationRecipient;
+        private IGenericRepository<Billing>? _billings;
 
         public UnitOfWork(AppDbContext context)
         {
@@ -78,6 +79,7 @@ namespace PropertyInspection.Infrastructure.UnitOfWork
         public IGenericRepository<RolePermission> RolePermissions => _rolePermissions ??= new GenericRepository<RolePermission>(_context);
         public IGenericRepository<Notification> Notifications => _notification ??= new GenericRepository<Notification>(_context);
         public IGenericRepository<NotificationRecipient> NotificationRecipients => _notificationRecipient ??= new GenericRepository<NotificationRecipient>(_context);
+        public IGenericRepository<Billing> Billings => _billings ??= new GenericRepository<Billing>(_context);
 
 
         public async Task<int> CommitAsync()

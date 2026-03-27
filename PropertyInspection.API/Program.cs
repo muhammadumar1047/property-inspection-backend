@@ -103,6 +103,7 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IMobileDashboardService, MobileDashboardService>();
 builder.Services.AddScoped<IMobileProfileService, ProfileService>();
 builder.Services.AddScoped<IMobileInspectionService, MobileInspectionService>();
+builder.Services.AddScoped<IBillingService, BillingService>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
