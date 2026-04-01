@@ -220,11 +220,13 @@ namespace PropertyInspection.Application.Services
                             new() { Description = "Action required by tenant", Type = "boolean", Value = null },
                             new() { Description = "Action required by landlord", Type = "boolean", Value = null }
                         },
-                        ReportItemComments = new List<ReportTemplateItemCommentDto>
-                        {
-                            new() { Text = string.Empty },
-                        },
-                        ReportMedia = CreateDefaultMedia()
+                        //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                        //{
+                        //    new() { Text = string.Empty },
+                        //},
+                        ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                        //ReportMedia = CreateDefaultMedia()
+                        ReportMedia = new List<ReportTemplateMediaDto>()
                     };
 
                     routineArea.ReportItems.Add(childArea);
@@ -232,7 +234,7 @@ namespace PropertyInspection.Application.Services
             }
 
             template.ReportAreas.Add(routineArea);
-            EnsureMediaPlaceholders(template);
+            //EnsureMediaPlaceholders(template);
             return template;
         }
 

@@ -252,86 +252,100 @@ namespace PropertyInspection.Application.Factories
                 new ReportTemplateItemDto
                 {
                     Name = "General Comments",
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                     ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
                     Name = "Maintenance Required",
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                     ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
                     Name = "Work to be Carried out by Tenant",
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                     ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
                     Name = "Work to be Carried out by Landlord",
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                     ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
                     Name = "Smoke Alarms",
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                     ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
                     Name = "Rent Review",
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                    ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
                 new ReportTemplateItemDto
                 {
                     Name = "Pets at Property",
-                    ReportItemComments = new List<ReportTemplateItemCommentDto>
-                    {
-                        new() { Text = "" },
-                    },
-                    ReportMedia = new List<ReportTemplateMediaDto>
-                    {
-                        new() { Url = "", Type = "" },
-                    }
+                    //ReportItemComments = new List<ReportTemplateItemCommentDto>
+                    //{
+                    //    new() { Text = "" },
+                    //},
+                    //ReportMedia = new List<ReportTemplateMediaDto>
+                    //{
+                    //    new() { Url = "", Type = "" },
+                    //}
+                    ReportItemComments = new List<ReportTemplateItemCommentDto>(),
+                    ReportMedia = new List<ReportTemplateMediaDto>()
                 },
             }
             };

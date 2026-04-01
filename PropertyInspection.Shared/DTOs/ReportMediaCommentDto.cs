@@ -1,18 +1,38 @@
-﻿using System;
-using System.Text.Json.Serialization;
-using PropertyInspection.Core.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace PropertyInspection.Shared.DTOs
 {
     public class ReportMediaCommentDto
     {
+        /// <summary>
+        /// Unique identifier of the media comment.
+        /// </summary>
         public Guid Id { get; set; }
+
+        /// <summary>
+        /// Identifier of the parent media record.
+        /// </summary>
         public Guid ReportMediaId { get; set; }
-        public string Text { get; set; } = null!;
+
+        /// <summary>
+        /// Comment text entered by the inspector.
+        /// </summary>
+        public string Text { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Optional X coordinate for an annotation point.
+        /// </summary>
         public decimal? X { get; set; }
+
+        /// <summary>
+        /// Optional Y coordinate for an annotation point.
+        /// </summary>
         public decimal? Y { get; set; }
 
-        [JsonIgnore]
-        public ReportMediaDto? ReportMedia { get; set; }
+        /// <summary>
+        /// Optional list of agencies allowed to view this comment.
+        /// </summary>
+        public List<Guid> AgencyWhitelist { get; set; } = new();
     }
 }

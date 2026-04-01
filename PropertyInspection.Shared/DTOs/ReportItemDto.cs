@@ -1,20 +1,33 @@
-using System;
-using System.Text.Json.Serialization;
-using PropertyInspection.Core.Enums;
+﻿using System;
+using System.Collections.Generic;
 
 namespace PropertyInspection.Shared.DTOs
 {
     public class ReportItemDto
     {
-        public Guid Id { get; set; }
-        public Guid ReportAreaId { get; set; }
-        public string Name { get; set; } = null!;
+        /// <summary>
+        /// Unique identifier of the report item.
+        /// </summary>
+        public Guid ItemId { get; set; }
 
-        [JsonIgnore]
-        public ReportAreaDto? ReportArea { get; set; }
+        /// <summary>
+        /// Display name of the item as shown in the report.
+        /// </summary>
+        public string ItemName { get; set; } = string.Empty;
 
-        public List<ReportItemConditionDto> ReportItemConditions { get; set; } = new();
-        public List<ReportItemCommentDto> ReportItemComments { get; set; } = new();
-        public List<ReportMediaDto> ReportMedia { get; set; } = new();
+        /// <summary>
+        /// Flexible list of conditions captured for this item (not limited to fixed keys).
+        /// </summary>
+        public List<ReportItemConditionDto> Conditions { get; set; } = new();
+
+        /// <summary>
+        /// Combined inspector comments for this item.
+        /// </summary>
+        public string InspectorComments { get; set; } = string.Empty;
+
+        /// <summary>
+        /// All media associated with this item (photos and videos are not separated).
+        /// </summary>
+        public List<ReportMediaDto> Media { get; set; } = new();
     }
 }

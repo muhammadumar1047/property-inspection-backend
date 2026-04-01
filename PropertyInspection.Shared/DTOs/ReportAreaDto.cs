@@ -1,18 +1,12 @@
-using System;
-using System.Text.Json.Serialization;
-using PropertyInspection.Core.Enums;
+﻿using System;
+using System.Collections.Generic;
 
 namespace PropertyInspection.Shared.DTOs
 {
     public class ReportAreaDto
     {
-        public Guid Id { get; set; }
-        public Guid ReportId { get; set; }
-        public string Name { get; set; } = null!;
-
-        [JsonIgnore]
-        public ReportDto? Report { get; set; }
-
-        public List<ReportItemDto> ReportItems { get; set; } = new();
+        public Guid AreaId { get; set; }
+        public string AreaName { get; set; } = string.Empty;
+        public List<ReportItemDto> Items { get; set; } = new();
     }
 }

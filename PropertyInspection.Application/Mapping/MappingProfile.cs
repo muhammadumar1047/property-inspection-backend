@@ -145,17 +145,21 @@ namespace PropertyInspection.Application.Mapping
                 .ForMember(d => d.TenancySnapshots, opt => opt.Ignore());
 
             CreateMap<LandlordSnapshot, LandlordSnapshotDto>()
-                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.LandlordId));
+                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.LandlordId))
+                .ForMember(d => d.Inspection, opt => opt.Ignore());
             CreateMap<TenancySnapshot, TenancySnapshotDto>()
-                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.TenancyId));
+                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.TenancyId))
+                .ForMember(d => d.Inspection, opt => opt.Ignore());
 
             // Reports
             CreateMap<Report, ReportDto>();
             CreateMap<ReportArea, ReportAreaDto>();
-            CreateMap<ReportItem, ReportItemDto>();
+            CreateMap<ReportItem, ReportItemDto>()
+                .ForMember(d => d.Media, opt => opt.MapFrom(s => s.ReportMedia));
             CreateMap<ReportItemCondition, ReportItemConditionDto>();
             CreateMap<ReportItemComment, ReportItemCommentDto>();
-            CreateMap<ReportMedia, ReportMediaDto>();
+            CreateMap<ReportMedia, ReportMediaDto>()
+                .ForMember(d => d.Comments, opt => opt.MapFrom(s => s.ReportMediaComments));
             CreateMap<ReportMediaComment, ReportMediaCommentDto>();
 
             // Notifications

@@ -1,5 +1,6 @@
 using System;
 using PropertyInspection.Core.Enums;
+using System.Text.Json.Serialization;
 
 namespace PropertyInspection.Shared.DTOs
 {
@@ -12,6 +13,7 @@ namespace PropertyInspection.Shared.DTOs
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public decimal RentAmount { get; set; }
+        [JsonIgnore]
         public InspectionResponse? Inspection { get; set; }
     }
 }

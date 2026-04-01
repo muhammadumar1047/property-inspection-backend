@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using PropertyInspection.Application.IServices;
 using PropertyInspection.Core.Entities;
 using PropertyInspection.Core.Enums;
@@ -147,10 +148,57 @@ namespace PropertyInspection.Application.Services
 
                 inspectionDto.AgencyId = tenantAgencyId;
 
+                var property = await _unitOfWork.Properties.FirstOrDefaultAsync(
+                    p => p.Id == inspectionDto.PropertyId && p.AgencyId == tenantAgencyId);
+                if (property == null)
+                {
+                    return new ServiceResponse<InspectionResponse>
+                    {
+                        Success = false,
+                        Message = "Property not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
+
                 var entity = _mapper.Map<Inspection>(inspectionDto);
                 entity.AgencyId = tenantAgencyId;
 
                 await _unitOfWork.Inspections.AddAsync(entity);
+
+                var propertyAddress = BuildPropertyAddress(property);
+
+                var landlords = await _unitOfWork.Landlords.GetAsync(l => l.PropertyId == property.Id);
+                foreach (var landlord in landlords)
+                {
+                    var landlordSnapshot = new LandlordSnapshot
+                    {
+                        InspectionId = entity.Id,
+                        LandlordId = landlord.Id,
+                        FullName = landlord.Name ?? string.Empty,
+                        Email = landlord.Email ?? string.Empty,
+                        Phone = landlord.Phone,
+                        Address = propertyAddress
+                    };
+                    await _unitOfWork.LandlordSnapshots.AddAsync(landlordSnapshot);
+                }
+
+                var tenancies = await _unitOfWork.Tenancies.GetAsync(t => t.PropertyId == property.Id);
+                foreach (var tenancy in tenancies)
+                {
+                    var tenancySnapshot = new TenancySnapshot
+                    {
+                        InspectionId = entity.Id,
+                        TenancyId = tenancy.Id,
+                        TenantName = tenancy.FullName ?? string.Empty,
+                        TenantEmail = tenancy.Email ?? string.Empty,
+                        TenantPhone = tenancy.Mobile,
+                        StartDate = tenancy.LeaseStartDate,
+                        EndDate = tenancy.LeaseEndDate,
+                        RentAmount = tenancy.CurrentRentAmount
+                    };
+                    await _unitOfWork.TenancySnapshots.AddAsync(tenancySnapshot);
+                }
+
                 await _unitOfWork.CommitAsync();
 
                 return new ServiceResponse<InspectionResponse>
@@ -367,6 +415,29 @@ namespace PropertyInspection.Application.Services
                     ErrorCode = ServiceErrorCodes.ServerError
                 };
             }
+        }
+
+        private static string BuildPropertyAddress(Property property)
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(property.Address1))
+            {
+                parts.Add(property.Address1.Trim());
+            }
+            if (!string.IsNullOrWhiteSpace(property.Address2))
+            {
+                parts.Add(property.Address2.Trim());
+            }
+            if (!string.IsNullOrWhiteSpace(property.CityOrSuburb))
+            {
+                parts.Add(property.CityOrSuburb.Trim());
+            }
+            if (!string.IsNullOrWhiteSpace(property.Postcode))
+            {
+                parts.Add(property.Postcode.Trim());
+            }
+
+            return string.Join(", ", parts);
         }
 
     }
