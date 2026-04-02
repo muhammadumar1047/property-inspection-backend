@@ -8,6 +8,7 @@ namespace PropertyInspection.Shared.DTOs
         public Guid InspectionId { get; set; }
         public string ReportType { get; set; } = string.Empty;
         public string? Notes { get; set; }
+        public InspectionResponse? Inspection { get; set; }
         public ReportHeaderDto Header { get; set; } = new();
         public List<ReportAreaDto> Areas { get; set; } = new();
     }

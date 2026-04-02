@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PropertyInspection.Application.IServices;
 using PropertyInspection.Core.Interfaces.UnitOfWork;
@@ -13,10 +14,12 @@ namespace PropertyInspection.Application.Services
     public class ReportService : IReportService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ReportService(IUnitOfWork unitOfWork)
+        public ReportService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<ServiceResponse<ReportDto>> GetReportByInspectionIdAsync(Guid inspectionId , Guid? agencyId)
@@ -79,7 +82,7 @@ namespace PropertyInspection.Application.Services
             }
         }
 
-        private static ReportDto MapReport(Report report)
+        private ReportDto MapReport(Report report)
         {
             var inspection = report.Inspection;
             var agency = inspection?.Agency;
@@ -179,6 +182,7 @@ namespace PropertyInspection.Application.Services
                 InspectionId = report.InspectionId,
                 ReportType = report.ReportType ?? string.Empty,
                 Notes = report.Notes ?? string.Empty,
+                Inspection = inspection == null ? null : _mapper.Map<InspectionResponse>(inspection),
                 Header = header,
                 Areas = areas
             };
