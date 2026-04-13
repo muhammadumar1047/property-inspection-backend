@@ -59,6 +59,7 @@ namespace PropertyInspection.Infrastructure.Data
         public DbSet<TimeZoneLookup> TimeZoneLookups { get; set; }
         public DbSet<Billing> Billings { get; set; }
         public DbSet<BillingFeature> BillingFeatures { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder builder)
