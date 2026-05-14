@@ -9,9 +9,11 @@ namespace PropertyInspection.Shared.DTOs
         public string ReportTitle { get; set; } = string.Empty;
         public string AgencyLogoUrl { get; set; } = string.Empty;
         public string AgencyName { get; set; } = string.Empty;
+        public string AgencyAddress { get; set; } = string.Empty;
         public string AgencyPhone { get; set; } = string.Empty;
         public WhitelabelBrandingDto AgencyWhiteLabel { get; set; } = new();
         public string PropertyAddress { get; set; } = string.Empty;
+        public string PropertyState { get; set; } = string.Empty;
         public DateTime? LeaseStartDate { get; set; }
         public DateTime? LeaseEndDate { get; set; }
         public DateTime InspectionDate { get; set; }

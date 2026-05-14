@@ -132,6 +132,7 @@ namespace PropertyInspection.Application.Services
                 AgencyLogoUrl = whitelabel?.LogoUrl ?? string.Empty,
                 AgencyName = agency?.LegalBusinessName ?? string.Empty,
                 AgencyPhone = agency?.PhoneNumber ?? string.Empty,
+                AgencyAddress = agency?.Address ?? string.Empty,
                 AgencyWhiteLabel = whitelabel == null
                     ? new WhitelabelBrandingDto()
                     : new WhitelabelBrandingDto
@@ -146,6 +147,7 @@ namespace PropertyInspection.Application.Services
                         FontFamily = whitelabel.FontFamily
                     },
                 PropertyAddress = string.Join(", ", propertyAddressParts),
+                PropertyState = inspection?.Property?.State?.Name ?? string.Empty,
                 LeaseStartDate = tenancy?.StartDate,
                 LeaseEndDate = tenancy?.EndDate,
                 InspectionDate = inspection?.InspectionDate ?? DateTime.MinValue,
