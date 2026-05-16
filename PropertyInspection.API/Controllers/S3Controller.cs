@@ -39,7 +39,7 @@ namespace PropertyInspection.API.Controllers
 
         [HttpGet("generate-upload-url")]
         public async Task<ActionResult<ApiResponse<object>>> GenerateUploadUrl(
-            [FromQuery] string agencyId,
+            [FromQuery] string? agencyId,
             [FromQuery] string propertyId,
             [FromQuery] string inspectionId,
             [FromQuery] string mediaType,
