@@ -170,7 +170,6 @@ using (var scope = app.Services.CreateScope())
     await roleSeeder.EnsureDefaultRolesForAllAgenciesAsync();
     await IdentitySeeder.SeedSuperAdminAsync(services);
 }
-app.MapHub<NotificationHub>("/notificationHub");
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -179,6 +178,8 @@ if (app.Environment.IsDevelopment())
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors("AllowFrontend");
+
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -187,6 +188,8 @@ app.UseAuthorization();
 app.UseMiddleware<TenantContextMiddleware>();
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/notificationHub")
+   .RequireCors("AllowFrontend");
 app.MapGet("/health", () => Results.Ok("ok"));
 
 app.Run();
