@@ -123,15 +123,30 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //    });
 //});
 
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowFrontend",
+//        builder =>
+//        {
+//            builder.WithOrigins("http://ec2-52-62-164-129.ap-southeast-2.compute.amazonaws.com:3000")
+//                   .AllowAnyHeader()
+//                   .AllowAnyMethod()
+//                   .AllowCredentials(); // SignalR ke liye
+//        });
+//});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        builder =>
+        policy =>
         {
-            builder.WithOrigins("http://ec2-52-62-164-129.ap-southeast-2.compute.amazonaws.com:3000")
-                   .AllowAnyHeader()
-                   .AllowAnyMethod()
-                   .AllowCredentials(); // SignalR ke liye
+            policy.WithOrigins(
+                    "https://app.easeinspect.com",
+                    "http://ec2-52-62-164-129.ap-southeast-2.compute.amazonaws.com:3000",
+                    "http://localhost:3000"
+                  )
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
         });
 });
 
