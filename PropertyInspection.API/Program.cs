@@ -136,18 +136,16 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //});
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy.WithOrigins(
-                    "https://app.easeinspect.com",
-                    "http://ec2-52-62-164-129.ap-southeast-2.compute.amazonaws.com:3000",
-                    "http://localhost:3000"
-                  )
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials();
-        });
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "https://app.easeinspect.com"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .SetIsOriginAllowedToAllowWildcardSubdomains();
+    });
 });
 
 
@@ -177,7 +175,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseHttpsRedirection();
+
 app.UseRouting();
 app.UseCors("AllowFrontend");
 
@@ -188,6 +186,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<TenantContextMiddleware>();
+//app.UseHttpsRedirection();
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/notificationHub")
