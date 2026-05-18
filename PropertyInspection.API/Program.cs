@@ -139,7 +139,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins(
-                "https://app.easeinspect.com"
+                "https://app.easeinspect.com",
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "https://localhost:3000",
+                "https://localhost:7001"
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
@@ -189,7 +193,7 @@ app.UseMiddleware<TenantContextMiddleware>();
 //app.UseHttpsRedirection();
 
 app.MapControllers();
-app.MapHub<NotificationHub>("/notificationHub")
+app.MapHub<NotificationHub>("/api/notificationHub")
    .RequireCors("AllowFrontend");
 app.MapGet("/health", () => Results.Ok("ok"));
 
