@@ -11,22 +11,3 @@ services:
       - "5000:5000"
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      DefaultConnection: Host=postgres;Port=5432;Database=propertydb;Username=postgres;Password=postgres
-    depends_on:
-      - postgres
-
-  postgres:
-    image: postgres:15
-    container_name: postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: propertydb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
