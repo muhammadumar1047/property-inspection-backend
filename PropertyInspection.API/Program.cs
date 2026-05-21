@@ -100,6 +100,7 @@ builder.Services.AddScoped<IReportSyncService, ReportSyncService>();
 builder.Services.AddScoped<IReportTemplateService, ReportTemplateService>();
 builder.Services.AddScoped<IMobileReportTemplateService, MobileReportTemplateService>();
 builder.Services.AddScoped<IS3Service, S3Service>();
+builder.Services.AddScoped<IS3StorageService, S3StorageService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<ILookupService, LookupService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();

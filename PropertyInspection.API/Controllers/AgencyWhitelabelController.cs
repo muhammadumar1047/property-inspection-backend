@@ -12,10 +12,17 @@ namespace PropertyInspection.API.Controllers
     public class AgencyWhitelabelController : ControllerBase
     {
         private readonly IAgencyWhitelabelService _whitelabelService;
+        private readonly IS3StorageService _s3StorageService;
+        private readonly ITenantAgencyResolver _tenantAgencyResolver;
 
-        public AgencyWhitelabelController(IAgencyWhitelabelService whitelabelService)
+        public AgencyWhitelabelController(
+            IAgencyWhitelabelService whitelabelService,
+            IS3StorageService s3StorageService,
+            ITenantAgencyResolver tenantAgencyResolver)
         {
             _whitelabelService = whitelabelService;
+            _s3StorageService = s3StorageService;
+            _tenantAgencyResolver = tenantAgencyResolver;
         }
 
         [HttpGet]
@@ -116,6 +123,30 @@ namespace PropertyInspection.API.Controllers
                 Message = "Record retrieved successfully",
                 Data = branding
             });
+        }
+
+        [HttpPost("logo")]
+        public async Task<ActionResult<ApiResponse<string>>> UploadLogo(IFormFile file)
+        {
+            try
+            {
+                var agencyId = _tenantAgencyResolver.ResolveAgencyId(null);
+                var url = await _s3StorageService.UploadLogoAsync(file, agencyId.ToString());
+                return Ok(new ApiResponse<string>
+                {
+                    Success = true,
+                    Message = "Logo uploaded successfully",
+                    Data = url
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
         }
     }
 }
