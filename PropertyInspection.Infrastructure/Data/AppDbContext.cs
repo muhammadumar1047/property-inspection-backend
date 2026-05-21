@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PropertyInspection.Core.Entities;
 using PropertyInspection.Infrastructure.Auth;
@@ -60,6 +60,9 @@ namespace PropertyInspection.Infrastructure.Data
         public DbSet<Billing> Billings { get; set; }
         public DbSet<BillingFeature> BillingFeatures { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<EmailTemplate> EmailTemplates { get; set; }
+        public DbSet<QuickSuggestion> QuickSuggestions { get; set; }
+        public DbSet<QuickSuggestionSettings> QuickSuggestionSettings { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder builder)

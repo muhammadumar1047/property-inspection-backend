@@ -14,10 +14,12 @@ using PropertyInspection.Application.Services;
 using PropertyInspection.Application.Mapping;
 using PropertyInspection.Core.Interfaces.Repositories;
 using PropertyInspection.Core.Interfaces.UnitOfWork;
+using PropertyInspection.Core.Interfaces.Services;
 using PropertyInspection.Infrastructure.Auth;
 using PropertyInspection.Infrastructure.Data;
 using PropertyInspection.Infrastructure.Data.Seeder;
 using PropertyInspection.Infrastructure.Repositories;
+using PropertyInspection.Infrastructure.Services;
 using PropertyInspection.Infrastructure.UnitOfWork;
 using PropertyInspection.Shared;
 using System.Text;
@@ -62,6 +64,8 @@ builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler
 
 builder.Services.Configure<AwsSettings>(builder.Configuration.GetSection("AWS"));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGridSettings"));
+
 
 builder.Services.AddScoped<TenantContext>();
 builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
@@ -104,8 +108,12 @@ builder.Services.AddScoped<IMobileDashboardService, MobileDashboardService>();
 builder.Services.AddScoped<IMobileProfileService, ProfileService>();
 builder.Services.AddScoped<IMobileInspectionService, MobileInspectionService>();
 builder.Services.AddScoped<IBillingService, BillingService>();
+builder.Services.AddScoped<IEmailService, SendGridEmailService>();
+builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
+builder.Services.AddScoped<IQuickSuggestionService, QuickSuggestionService>();
+builder.Services.AddScoped<IEmailTemplateProcessor, EmailTemplateProcessor>();
 
-builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddAutoMapper(cfg => {}, typeof(MappingProfile).Assembly);
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();

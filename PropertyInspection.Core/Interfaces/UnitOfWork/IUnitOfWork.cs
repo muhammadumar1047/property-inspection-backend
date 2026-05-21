@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage;
 using PropertyInspection.Core.Entities;
 using PropertyInspection.Core.Interfaces.Repositories;
 
@@ -38,6 +38,9 @@ namespace PropertyInspection.Core.Interfaces.UnitOfWork
         IGenericRepository<Notification> Notifications { get; }
         IGenericRepository<NotificationRecipient> NotificationRecipients { get; }
         IGenericRepository<Billing> Billings { get; }
+        IGenericRepository<EmailTemplate> EmailTemplates { get; }
+        IGenericRepository<QuickSuggestion> QuickSuggestions { get; }
+        IGenericRepository<QuickSuggestionSettings> QuickSuggestionSettings { get; }
 
         Task<int> CommitAsync();
         Task<IDbContextTransaction> BeginTransactionAsync();

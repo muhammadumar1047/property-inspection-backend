@@ -211,12 +211,12 @@ namespace PropertyInspection.Application.Services
                     Data = _mapper.Map<UserResponse>(user)
                 };
             }
-            catch
+            catch (Exception ex)
             {
                 return new ServiceResponse<UserResponse>
                 {
                     Success = false,
-                    Message = "Unable to process the request at the moment",
+                    Message = $"User Service Exception: {ex.Message} - {ex.InnerException?.Message}",
                     ErrorCode = ServiceErrorCodes.ServerError
                 };
             }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using PropertyInspection.Core.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +13,19 @@ namespace PropertyInspection.Infrastructure.Auth
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
+
 
         public IdentityAuthService(SignInManager<ApplicationUser> signInManager,
-                                   UserManager<ApplicationUser> userManager)
+                                   UserManager<ApplicationUser> userManager,
+                                   IConfiguration configuration,
+                                   IEmailService emailService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
+            _emailService = emailService;
+            _configuration = configuration;
         }
 
         public async Task<PropertyInspection.Shared.ServiceResponse<ApplicationUser>> LoginAsync(string email, string password)
@@ -130,11 +139,12 @@ namespace PropertyInspection.Infrastructure.Auth
 
                 if (!result.Succeeded)
                 {
+                    var errors = string.Join("; ", result.Errors.Select(e => e.Description));
                     return new PropertyInspection.Shared.ServiceResponse<ApplicationUser>
                     {
                         Success = false,
-                        Message = "Unable to process the request at the moment",
-                        ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.ServerError
+                        Message = $"Identity Error: {errors}",
+                        ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.InvalidRequest
                     };
                 }
 
@@ -145,12 +155,12 @@ namespace PropertyInspection.Infrastructure.Auth
                     Data = identityUser
                 };
             }
-            catch
+            catch (Exception ex)
             {
                 return new PropertyInspection.Shared.ServiceResponse<ApplicationUser>
                 {
                     Success = false,
-                    Message = "Unable to process the request at the moment",
+                    Message = $"Identity Exception: {ex.Message} - {ex.InnerException?.Message}",
                     ErrorCode = PropertyInspection.Shared.ServiceErrorCodes.ServerError
                 };
             }
@@ -244,5 +254,40 @@ namespace PropertyInspection.Infrastructure.Auth
                 };
             }
         }
+
+        public async Task ForgotPassword(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+                return; // security: don't reveal
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var encodedToken = System.Web.HttpUtility.UrlEncode(token);
+
+            var baseUrl = _configuration["Frontend:BaseUrl"];
+
+            var link = $"{baseUrl}/reset-password?email={email}&token={encodedToken}";
+
+            await _emailService.SendAsync(email, "Reset Password", link);
+        }
+
+        public async Task ResetPassword(string email, string token, string newPassword)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+                throw new Exception("Invalid request");
+
+            var decodedToken = System.Web.HttpUtility.UrlDecode(token);
+
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, newPassword);
+
+            if (!result.Succeeded)
+                throw new Exception("Password reset failed");
+        }
     }
+
+
 }

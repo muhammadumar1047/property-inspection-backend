@@ -1,4 +1,4 @@
-﻿using PropertyInspection.Shared;
+using PropertyInspection.Shared;
 
 namespace PropertyInspection.API.Middleware
 {
@@ -27,7 +27,7 @@ namespace PropertyInspection.API.Middleware
                 var response = new ApiResponse<object>
                 {
                     Success = false,
-                    Message = "Unable to process the request at the moment",
+                    Message = $"Internal Server Error: {ex.Message} - {ex.InnerException?.Message}\nStack Trace: {ex.StackTrace}",
                     ErrorCode = ServiceErrorCodes.ServerError,
                     Data = null!
                 };

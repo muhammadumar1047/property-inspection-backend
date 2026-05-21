@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PropertyInspection.Infrastructure.Data;
@@ -11,9 +12,11 @@ using PropertyInspection.Infrastructure.Data;
 namespace PropertyInspection.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260520132203_AddEmailTemplates")]
+    partial class AddEmailTemplates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2916,119 +2919,6 @@ namespace PropertyInspection.Infrastructure.Migrations
                     b.HasIndex("AgencyId");
 
                     b.ToTable("PropertyLayout");
-                });
-
-            modelBuilder.Entity("PropertyInspection.Core.Entities.QuickSuggestion", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AgencyId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Shortcut")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AgencyId", "Type", "IsDeleted")
-                        .HasDatabaseName("IX_QuickSuggestions_AgencyId_Type_IsDeleted");
-
-                    b.HasIndex("AgencyId", "Type", "Shortcut", "IsDeleted")
-                        .IsUnique()
-                        .HasDatabaseName("UQ_QuickSuggestions_Shortcut")
-                        .HasFilter("\"IsDeleted\" = FALSE AND \"Shortcut\" IS NOT NULL AND \"Shortcut\" != ''");
-
-                    b.HasIndex("AgencyId", "Type", "Text", "IsDeleted")
-                        .IsUnique()
-                        .HasDatabaseName("UQ_QuickSuggestions_Text")
-                        .HasFilter("\"IsDeleted\" = FALSE");
-
-                    b.ToTable("QuickSuggestions");
-                });
-
-            modelBuilder.Entity("PropertyInspection.Core.Entities.QuickSuggestionSettings", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AgencyId")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("CombineDictionaries")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsEntryExitEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsRoutineEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AgencyId")
-                        .IsUnique();
-
-                    b.ToTable("QuickSuggestionSettings");
                 });
 
             modelBuilder.Entity("PropertyInspection.Core.Entities.Report", b =>
@@ -38870,28 +38760,6 @@ namespace PropertyInspection.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("PropertyInspection.Core.Entities.PropertyLayout", b =>
-                {
-                    b.HasOne("PropertyInspection.Core.Entities.Agency", "Agency")
-                        .WithMany()
-                        .HasForeignKey("AgencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Agency");
-                });
-
-            modelBuilder.Entity("PropertyInspection.Core.Entities.QuickSuggestion", b =>
-                {
-                    b.HasOne("PropertyInspection.Core.Entities.Agency", "Agency")
-                        .WithMany()
-                        .HasForeignKey("AgencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Agency");
-                });
-
-            modelBuilder.Entity("PropertyInspection.Core.Entities.QuickSuggestionSettings", b =>
                 {
                     b.HasOne("PropertyInspection.Core.Entities.Agency", "Agency")
                         .WithMany()

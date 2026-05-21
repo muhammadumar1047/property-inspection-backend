@@ -15,6 +15,8 @@ namespace PropertyInspection.Infrastructure.Auth
         Task<PropertyInspection.Shared.ServiceResponse<ApplicationUser>> CreateUserAsync(ApplicationUser identityUser, string password);
         Task<PropertyInspection.Shared.ServiceResponse<bool>> UpdateUserPasswordAsync(string email, string newPassword);
         Task<PropertyInspection.Shared.ServiceResponse<bool>> DeleteUserAsync(ApplicationUser user);
+        Task ForgotPassword(string email);
+        Task ResetPassword(string email, string token, string newPassword);
 
     }
 }

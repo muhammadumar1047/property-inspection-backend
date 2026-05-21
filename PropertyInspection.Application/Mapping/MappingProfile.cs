@@ -1,7 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using System;
 using System.Linq;
 using PropertyInspection.Core.Entities;
+using PropertyInspection.Core.Enums;
 using PropertyInspection.Shared.Auth;
 using PropertyInspection.Shared.DTOs;
 using PropertyInspection.Shared.DTOs;
@@ -162,6 +163,20 @@ namespace PropertyInspection.Application.Mapping
                 .ForMember(d => d.Comments, opt => opt.MapFrom(s => s.ReportMediaComments));
             CreateMap<ReportMediaComment, ReportMediaCommentDto>();
 
+
+
+            // Email Templates
+            CreateMap<EmailTemplate, EmailTemplateResponse>()
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()))
+                .ForMember(d => d.Snippet, opt => opt.MapFrom(s => s.Body.Length > 100 ? s.Body.Substring(0, 100) + "..." : s.Body))
+                .ForMember(d => d.LastUpdated, opt => opt.MapFrom(s => s.UpdatedAt ?? s.CreatedAt));
+
+            CreateMap<CreateEmailTemplateRequest, EmailTemplate>()
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status == "Draft" ? TemplateStatus.Draft : TemplateStatus.Published));
+
+            CreateMap<UpdateEmailTemplateRequest, EmailTemplate>()
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status == "Draft" ? TemplateStatus.Draft : TemplateStatus.Published));
+
             // Notifications
             CreateMap<CreateNotificationDto, Notification>();
             CreateMap<NotificationRecipient, UserNotificationDto>()
@@ -224,6 +239,14 @@ namespace PropertyInspection.Application.Mapping
                         ? string.Empty
                         : string.Join(" ", new[] { s.Inspector.FirstName, s.Inspector.LastName }.Where(x => !string.IsNullOrWhiteSpace(x)))))
                 .ForMember(d => d.ScheduledDateTime, opt => opt.MapFrom(s => DateTime.SpecifyKind(s.InspectionDate, DateTimeKind.Utc)));
+
+            // Quick Suggestions mappings
+            CreateMap<QuickSuggestion, QuickSuggestionResponse>();
+            CreateMap<CreateQuickSuggestionRequest, QuickSuggestion>();
+            CreateMap<UpdateQuickSuggestionRequest, QuickSuggestion>();
+
+            CreateMap<QuickSuggestionSettings, QuickSuggestionSettingsResponse>();
+            CreateMap<UpdateQuickSuggestionSettingsRequest, QuickSuggestionSettings>();
         }
     }
 }

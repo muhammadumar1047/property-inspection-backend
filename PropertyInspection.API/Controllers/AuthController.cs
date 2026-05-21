@@ -182,5 +182,19 @@ namespace PropertyInspection.API.Controllaers
             var result = await _userAuthService.UpdateUserPasswordAsync(model.Email, model.NewPassword);
             return this.ToActionResult(result);
         }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
+        {
+            await _userAuthService.ForgotPassword(dto.Email);
+            return Ok("If email exists, reset link sent");
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
+        {
+            await _userAuthService.ResetPassword(dto.Email, dto.Token, dto.NewPassword);
+            return Ok("Password reset successful");
+        }
     }
 }
