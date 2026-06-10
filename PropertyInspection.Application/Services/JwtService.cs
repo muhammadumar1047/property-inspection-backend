@@ -20,11 +20,16 @@ namespace PropertyInspection.Application.Services
             _configuration = configuration;
         }
 
-        public string GenerateJwtToken(IEnumerable<Claim> claims)
+        public string GenerateJwtToken(IEnumerable<Claim> claims, bool rememberMe = false)
         {
             var jwtIssuer = _configuration["Jwt:Issuer"];
             var jwtAudience = _configuration["Jwt:Audience"];
             var jwtKey = _configuration["Jwt:Key"];
+
+            // Read token expiry from configuration, with fallback defaults
+            var defaultExpiry = _configuration.GetValue<int>("Jwt:TokenExpiryMinutes", 120);
+            var rememberMeExpiry = _configuration.GetValue<int>("Jwt:TokenExpiryMinutesRememberMe", 10080);
+            var expiryMinutes = rememberMe ? rememberMeExpiry : defaultExpiry;
 
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwtKey!)
@@ -39,7 +44,7 @@ namespace PropertyInspection.Application.Services
                 issuer: jwtIssuer,
                 audience: jwtAudience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddMinutes(expiryMinutes),
                 signingCredentials: creds
             );
 

@@ -9,6 +9,6 @@ namespace PropertyInspection.Application.IServices
 {
     public interface IJwtService
     {
-        string GenerateJwtToken(IEnumerable<Claim> claims);
+        string GenerateJwtToken(IEnumerable<Claim> claims, bool rememberMe = false);
     }
 }

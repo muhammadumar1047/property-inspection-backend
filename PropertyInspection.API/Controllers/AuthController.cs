@@ -34,7 +34,7 @@ namespace PropertyInspection.API.Controllaers
         [HttpPost("login")]
         public async Task<ActionResult<ApiResponse<object>>> Login(LoginDto dto)
         {
-            var loginResult = await _userAuthService.LoginAsync(dto.Email, dto.Password);
+            var loginResult = await _userAuthService.LoginAsync(dto.Email, dto.Password, dto.RememberMe);
             if (!loginResult.Success || loginResult.Data == null)
             {
                 return this.ToActionResult(new ServiceResponse<object>
@@ -128,7 +128,7 @@ namespace PropertyInspection.API.Controllaers
 
             await _permissionCacheService.SetPermissionsAsync(domainUser.Id, permissions);
 
-            var token = _jwtService.GenerateJwtToken(claims);
+            var token = _jwtService.GenerateJwtToken(claims, dto.RememberMe);
 
             return Ok(new ApiResponse<object>
             {

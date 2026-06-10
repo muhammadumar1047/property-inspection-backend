@@ -28,7 +28,7 @@ namespace PropertyInspection.Infrastructure.Auth
             _configuration = configuration;
         }
 
-        public async Task<PropertyInspection.Shared.ServiceResponse<ApplicationUser>> LoginAsync(string email, string password)
+        public async Task<PropertyInspection.Shared.ServiceResponse<ApplicationUser>> LoginAsync(string email, string password, bool rememberMe = false)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace PropertyInspection.Infrastructure.Auth
                     };
                 }
 
-                var result = await _signInManager.PasswordSignInAsync(user, password, false, true);
+                var result = await _signInManager.PasswordSignInAsync(user, password, rememberMe, true);
                 if (!result.Succeeded)
                 {
                     return new PropertyInspection.Shared.ServiceResponse<ApplicationUser>

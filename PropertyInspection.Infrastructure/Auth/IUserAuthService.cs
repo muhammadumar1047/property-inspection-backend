@@ -9,7 +9,7 @@ namespace PropertyInspection.Infrastructure.Auth
 {
     public interface IUserAuthService
     {
-        Task<PropertyInspection.Shared.ServiceResponse<ApplicationUser>> LoginAsync(string email, string password);
+        Task<PropertyInspection.Shared.ServiceResponse<ApplicationUser>> LoginAsync(string email, string password, bool rememberMe = false);
         Task<PropertyInspection.Shared.ServiceResponse<bool>> LogoutAsync();
         Task<PropertyInspection.Shared.ServiceResponse<bool>> VerifyMfaAsync(string userId, string token);
         Task<PropertyInspection.Shared.ServiceResponse<ApplicationUser>> CreateUserAsync(ApplicationUser identityUser, string password);
