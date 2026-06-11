@@ -46,25 +46,28 @@ namespace PropertyInspection.Application.Services
                 {
                     var searchLower = search!.Trim().ToLower();
                     var lt = (PropertyInspection.Core.Enums.PropertyType)layoutType!.Value;
-                    predicate = l => l.AgencyId == tenantAgencyId
+                    predicate = l => !l.IsDeleted
+                        && l.AgencyId == tenantAgencyId
                         && l.Name.ToLower().Contains(searchLower)
                         && l.LayoutType == lt;
                 }
                 else if (hasSearch)
                 {
                     var searchLower = search!.Trim().ToLower();
-                    predicate = l => l.AgencyId == tenantAgencyId
+                    predicate = l => !l.IsDeleted
+                        && l.AgencyId == tenantAgencyId
                         && l.Name.ToLower().Contains(searchLower);
                 }
                 else if (hasLayoutType)
                 {
                     var lt = (PropertyInspection.Core.Enums.PropertyType)layoutType!.Value;
-                    predicate = l => l.AgencyId == tenantAgencyId
+                    predicate = l => !l.IsDeleted
+                        && l.AgencyId == tenantAgencyId
                         && l.LayoutType == lt;
                 }
                 else
                 {
-                    predicate = l => l.AgencyId == tenantAgencyId;
+                    predicate = l => !l.IsDeleted && l.AgencyId == tenantAgencyId;
                 }
 
                 var (layouts, totalCount) = await _unitOfWork.PropertyLayout.GetPagedAsync(
@@ -109,7 +112,7 @@ namespace PropertyInspection.Application.Services
             {
                 var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
                 var layout = await _unitOfWork.PropertyLayout.GetAsync(
-                    predicate: l => l.Id == layoutId && l.AgencyId == tenantAgencyId,
+                    predicate: l => !l.IsDeleted && l.Id == layoutId && l.AgencyId == tenantAgencyId,
                     include: q => q
                         .Include(l => l.Areas)
                         .ThenInclude(a => a.Items)
