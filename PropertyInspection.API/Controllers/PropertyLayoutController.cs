@@ -23,10 +23,12 @@ namespace PropertyInspection.API.Controllers
         public async Task<ActionResult<ApiResponse<PagedResult<PropertyLayoutResponse>>>> GetAllByAgency(
             Guid? agencyId,
             int pageNumber = 1,
-            int pageSize = 10
+            int pageSize = 10,
+            string? search = null,
+            int? layoutType = null
         )
         {
-            var result = await _propertyLayoutService.GetAllByAgencyAsync(agencyId, pageNumber, pageSize);
+            var result = await _propertyLayoutService.GetAllByAgencyAsync(agencyId, pageNumber, pageSize, search, layoutType);
             return this.ToActionResult(result, new { Count = result.Data?.Data.Count ?? 0 });
         }
 

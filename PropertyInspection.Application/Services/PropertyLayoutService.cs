@@ -29,17 +29,48 @@ namespace PropertyInspection.Application.Services
         public async Task<ServiceResponse<PagedResult<PropertyLayoutResponse>>> GetAllByAgencyAsync(
             Guid? agencyId,
              int pageNumber = 1,
-             int pageSize = 10
+             int pageSize = 10,
+             string? search = null,
+             int? layoutType = null
         )
         {
             try
             {
                 var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
 
+                Expression<Func<PropertyLayout, bool>> predicate;
+                var hasSearch = !string.IsNullOrWhiteSpace(search);
+                var hasLayoutType = layoutType.HasValue;
+
+                if (hasSearch && hasLayoutType)
+                {
+                    var searchLower = search!.Trim().ToLower();
+                    var lt = (PropertyInspection.Core.Enums.PropertyType)layoutType!.Value;
+                    predicate = l => l.AgencyId == tenantAgencyId
+                        && l.Name.ToLower().Contains(searchLower)
+                        && l.LayoutType == lt;
+                }
+                else if (hasSearch)
+                {
+                    var searchLower = search!.Trim().ToLower();
+                    predicate = l => l.AgencyId == tenantAgencyId
+                        && l.Name.ToLower().Contains(searchLower);
+                }
+                else if (hasLayoutType)
+                {
+                    var lt = (PropertyInspection.Core.Enums.PropertyType)layoutType!.Value;
+                    predicate = l => l.AgencyId == tenantAgencyId
+                        && l.LayoutType == lt;
+                }
+                else
+                {
+                    predicate = l => l.AgencyId == tenantAgencyId;
+                }
+
                 var (layouts, totalCount) = await _unitOfWork.PropertyLayout.GetPagedAsync(
                     pageNumber: pageNumber,
                     pageSize: pageSize,
-                    predicate: l => l.AgencyId == tenantAgencyId,
+                    predicate: predicate,
                     include: q => q.Include(l => l.Areas)
                                       .ThenInclude(p => p.Items),
                     orderBy: q => q.OrderBy(l => l.DisplayOrder)

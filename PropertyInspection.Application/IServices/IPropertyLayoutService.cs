@@ -13,7 +13,9 @@ namespace PropertyInspection.Application.IServices
         Task<ServiceResponse<PagedResult<PropertyLayoutResponse>>> GetAllByAgencyAsync(
             Guid? agencyId,
             int pageNumber = 1,
-            int pageSize = 10
+            int pageSize = 10,
+            string? search = null,
+            int? layoutType = null
         );
 
         /// <summary>
