@@ -390,8 +390,10 @@ namespace PropertyInspection.Application.Services
                     Data = true
                 };
             }
-            catch
+            catch (Exception ex)
             {
+                // Log the full exception for diagnostics; only return a user-safe message
+                System.Diagnostics.Debug.WriteLine($"[PropertyService.UpdateAsync] Failed to update property {propertyId}: {ex}");
                 return new ServiceResponse<bool>
                 {
                     Success = false,
