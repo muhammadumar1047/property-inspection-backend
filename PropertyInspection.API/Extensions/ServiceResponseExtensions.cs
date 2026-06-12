@@ -33,6 +33,7 @@ namespace PropertyInspection.API.Extensions
             {
                 ServiceErrorCodes.NotFound => controller.NotFound(response),
                 ServiceErrorCodes.Conflict => controller.Conflict(response),
+                ServiceErrorCodes.LayoutInUse => controller.Conflict(response),
                 ServiceErrorCodes.Unauthorized => controller.Unauthorized(response),
                 ServiceErrorCodes.Forbidden => controller.StatusCode(StatusCodes.Status403Forbidden, response),
                 ServiceErrorCodes.ServerError => controller.StatusCode(StatusCodes.Status500InternalServerError, response),

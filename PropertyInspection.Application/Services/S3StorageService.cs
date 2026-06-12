@@ -29,9 +29,9 @@ namespace PropertyInspection.Application.Services
             if (file == null || file.Length == 0)
                 throw new ArgumentException("File is empty or null.");
 
-            var bucketName = _configuration["AWS:BucketName"];
+            var bucketName = _configuration["AWS:S3Bucket"];
             if (string.IsNullOrEmpty(bucketName))
-                throw new InvalidOperationException("AWS:BucketName configuration is missing.");
+                throw new InvalidOperationException("AWS:S3Bucket configuration is missing.");
 
             // Basic validation
             if (file.Length > 2 * 1024 * 1024)
@@ -47,13 +47,13 @@ namespace PropertyInspection.Application.Services
             {
                 using var newMemoryStream = new MemoryStream();
                 await file.CopyToAsync(newMemoryStream);
+                newMemoryStream.Position = 0;
 
                 var uploadRequest = new TransferUtilityUploadRequest
                 {
                     InputStream = newMemoryStream,
                     Key = objectKey,
                     BucketName = bucketName,
-                    CannedACL = S3CannedACL.PublicRead,
                     ContentType = file.ContentType
                 };
 
@@ -71,8 +71,8 @@ namespace PropertyInspection.Application.Services
             }
             catch (AmazonS3Exception e)
             {
-                _logger.LogError(e, "Error encountered on server. Message:'{Message}' when writing an object", e.Message);
-                throw new Exception("Error uploading file to storage.", e);
+                _logger.LogError(e, "S3 upload failed. Bucket:'{Bucket}', Key:'{Key}', Message:'{Message}'", bucketName, objectKey, e.Message);
+                throw new InvalidOperationException($"Failed to upload file to S3: {e.Message}", e);
             }
             catch (Exception e)
             {

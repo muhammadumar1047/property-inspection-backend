@@ -130,7 +130,14 @@ namespace PropertyInspection.API.Controllers
         {
             try
             {
-                var agencyId = _tenantAgencyResolver.ResolveAgencyId(null);
+                // Read agencyId from FormData (injected by frontend interceptor when SuperAdmin impersonates an agency)
+                var agencyIdFromForm = Request.Form["agencyId"].FirstOrDefault();
+                Guid? requestedAgencyId = null;
+                if (!string.IsNullOrWhiteSpace(agencyIdFromForm) && Guid.TryParse(agencyIdFromForm, out var parsed))
+                {
+                    requestedAgencyId = parsed;
+                }
+                var agencyId = _tenantAgencyResolver.ResolveAgencyId(requestedAgencyId);
                 var url = await _s3StorageService.UploadLogoAsync(file, agencyId.ToString());
                 return Ok(new ApiResponse<string>
                 {

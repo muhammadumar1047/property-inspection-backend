@@ -283,6 +283,24 @@ namespace PropertyInspection.Application.Services
                     };
                 }
 
+                // Check if this layout is assigned to any properties
+                var assignedProperties = await _unitOfWork.Properties.GetAsync(
+                    p => p.PropertyLayoutId == layoutId && p.AgencyId == tenantAgencyId && !p.IsDeleted);
+
+                if (assignedProperties.Any())
+                {
+                    var propertyNames = assignedProperties
+                        .Select(p => p.Name)
+                        .ToList();
+
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = $"This layout is currently assigned to the following properties: {string.Join(", ", propertyNames)}. Please update or change the layout of those properties before proceeding with the deletion.",
+                        ErrorCode = ServiceErrorCodes.LayoutInUse
+                    };
+                }
+
                 await _unitOfWork.PropertyLayout.DeleteAsync(layout.Id, Guid.NewGuid());
                 await _unitOfWork.CommitAsync();
 

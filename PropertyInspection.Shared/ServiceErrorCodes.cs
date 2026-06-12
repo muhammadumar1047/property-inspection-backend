@@ -8,5 +8,6 @@ namespace PropertyInspection.Shared
         public const string Unauthorized = "UNAUTHORIZED";
         public const string Forbidden = "FORBIDDEN";
         public const string ServerError = "SERVER_ERROR";
+        public const string LayoutInUse = "LAYOUT_IN_USE";
     }
 }
