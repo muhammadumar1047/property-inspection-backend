@@ -16,6 +16,7 @@ namespace PropertyInspection.Application.IServices
         Task<ServiceResponse<bool>> UpdateAsync(Guid id, UpdateUserRequest dto, Guid userId);
         Task<ServiceResponse<bool>> DeleteAsync(Guid id, Guid userId);
         Task<ServiceResponse<UserResponse>> GetUserWithRolesByIdentityIdAsync(string identityUserId);
+
     }
 }
 

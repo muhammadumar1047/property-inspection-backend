@@ -113,6 +113,7 @@ builder.Services.AddScoped<IEmailService, SendGridEmailService>();
 builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 builder.Services.AddScoped<IQuickSuggestionService, QuickSuggestionService>();
 builder.Services.AddScoped<IEmailTemplateProcessor, EmailTemplateProcessor>();
+builder.Services.AddScoped<ISignatureService, SignatureService>();
 
 builder.Services.AddAutoMapper(cfg => {}, typeof(MappingProfile).Assembly);
 

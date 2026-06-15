@@ -14,6 +14,7 @@ namespace PropertyInspection.Core.Entities
         public string? LastName { get; set; }
         public string? Email { get; set; }
         public string? ProfileImage { get; set; }
+        public string? SignatureImage { get; set; }
         public bool IsSuperAdmin { get; set; } = false;
         public bool IsAgencyAdmin { get; set; } = false;
         public Guid? AgencyId { get; set; }

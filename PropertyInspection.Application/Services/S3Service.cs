@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using PropertyInspection.Application.IServices;
 using PropertyInspection.Core.Interfaces.UnitOfWork;
 using PropertyInspection.Shared;
+using PropertyInspection.Shared.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,6 +69,64 @@ namespace PropertyInspection.Application.Services
                     ErrorCode = ServiceErrorCodes.ServerError
                 });
             }
+        }
+
+        public Task<ServiceResponse<SignatureUploadUrlResponse>> GeneratePresignedUploadUrlWithKeyAsync(string folder, string fileName, string contentType)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(folder) || string.IsNullOrWhiteSpace(fileName) || string.IsNullOrWhiteSpace(contentType))
+                {
+                    return Task.FromResult(new ServiceResponse<SignatureUploadUrlResponse>
+                    {
+                        Success = false,
+                        Message = "Invalid request data",
+                        ErrorCode = ServiceErrorCodes.InvalidRequest
+                    });
+                }
+
+                var fileKey = $"{Guid.NewGuid()}_{fileName}";
+                var key = $"{folder}/{fileKey}";
+
+                var request = new GetPreSignedUrlRequest
+                {
+                    BucketName = _bucketName,
+                    Key = key,
+                    Verb = HttpVerb.PUT,
+                    Expires = DateTime.UtcNow.AddMinutes(10),
+                    ContentType = contentType
+                };
+
+                var url = _s3Client.GetPreSignedURL(request);
+                var fileUrl = BuildFileUrl(key);
+
+                return Task.FromResult(new ServiceResponse<SignatureUploadUrlResponse>
+                {
+                    Success = true,
+                    Message = "Record retrieved successfully",
+                    Data = new SignatureUploadUrlResponse
+                    {
+                        PreSignedUrl = url,
+                        FileKey = key,
+                        FileUrl = fileUrl
+                    }
+                });
+            }
+            catch
+            {
+                return Task.FromResult(new ServiceResponse<SignatureUploadUrlResponse>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                });
+            }
+        }
+
+        public string BuildFileUrl(string key)
+        {
+            var region = _s3Client.Config.RegionEndpoint?.SystemName ?? "us-east-1";
+            return $"https://{_bucketName}.s3.{region}.amazonaws.com/{key}";
         }
 
         public Task<ServiceResponse<string>> GeneratePresignedDownloadUrlAsync(string folder, string fileName)
@@ -253,9 +312,6 @@ namespace PropertyInspection.Application.Services
                     ErrorCode = ServiceErrorCodes.ServerError
                 };
             }
-        }   
-
-
-
+        }
     }
 }
