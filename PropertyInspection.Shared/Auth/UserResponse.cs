@@ -14,8 +14,9 @@ namespace PropertyInspection.Shared.Auth
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; }
         public string ProfileImage { get; set; } = string.Empty;
+        public string? SignatureImage { get; set; }
         public Guid? AgencyId { get; set; }
-        public string? AgencyName { get; set; } 
+        public string? AgencyName { get; set; }
         public bool IsSuperAdmin { get; set; } = false;
         public bool IsAgencyAdmin { get; set; } = false;
         public List<UserRoleDto>? UserRoles { get; set; } = new List<UserRoleDto>();

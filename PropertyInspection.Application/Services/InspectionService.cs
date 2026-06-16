@@ -253,6 +253,14 @@ namespace PropertyInspection.Application.Services
 
                 _mapper.Map(inspectionRequest, existing);
 
+                // Convert date-only values to UTC for PostgreSQL timestamp-with-timezone columns
+                if (existing.InspectionCompletedDate.HasValue && existing.InspectionCompletedDate.Value.Kind != DateTimeKind.Utc)
+                    existing.InspectionCompletedDate = DateTime.SpecifyKind(existing.InspectionCompletedDate.Value, DateTimeKind.Utc);
+                if (existing.InspectionCloseDate.HasValue && existing.InspectionCloseDate.Value.Kind != DateTimeKind.Utc)
+                    existing.InspectionCloseDate = DateTime.SpecifyKind(existing.InspectionCloseDate.Value, DateTimeKind.Utc);
+                if (existing.SignatureDate.HasValue && existing.SignatureDate.Value.Kind != DateTimeKind.Utc)
+                    existing.SignatureDate = DateTime.SpecifyKind(existing.SignatureDate.Value, DateTimeKind.Utc);
+
                 await _unitOfWork.Inspections.UpdateAsync(existing);
                 await _unitOfWork.CommitAsync();
 
@@ -273,7 +281,49 @@ namespace PropertyInspection.Application.Services
                 };
             }
         }
-            
+
+        public async Task<ServiceResponse<bool>> UpdatePdfUrlAsync(Guid inspectionId, Guid? agencyId, string pdfUrl)
+        {
+            try
+            {
+                var tenantAgencyId = _tenantAgencyResolver.ResolveAgencyId(agencyId);
+
+                var inspection = await _unitOfWork.Inspections.FirstOrDefaultAsync(
+                    i => i.Id == inspectionId && i.AgencyId == tenantAgencyId);
+
+                if (inspection == null)
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Inspection not found",
+                        ErrorCode = ServiceErrorCodes.NotFound
+                    };
+                }
+
+                inspection.PdfUrl = pdfUrl;
+
+                await _unitOfWork.Inspections.UpdateAsync(inspection);
+                await _unitOfWork.CommitAsync();
+
+                return new ServiceResponse<bool>
+                {
+                    Success = true,
+                    Message = "PDF URL updated successfully",
+                    Data = true
+                };
+            }
+            catch
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Unable to process the request at the moment",
+                    ErrorCode = ServiceErrorCodes.ServerError
+                };
+            }
+        }
+             
         public async Task<ServiceResponse<IReadOnlyList<InspectionResponse>>> GetAllByPropertyAsync(Guid propertyId, Guid? agencyId)
         {
             try

@@ -37,7 +37,7 @@ namespace PropertyInspection.Infrastructure.Services
             _sendGridClient = new SendGridClient(_settings.ApiKey);
         }
 
-        public async Task SendAsync(string to, string subject, string body)
+        public async Task SendAsync(string to, string subject, string body, string? fromEmail = null, string? fromName = null)
         {
             if (string.IsNullOrWhiteSpace(to))
             {
@@ -48,7 +48,10 @@ namespace PropertyInspection.Infrastructure.Services
 
             try
             {
-                var fromAddress = new EmailAddress(_settings.FromEmail, _settings.FromName ?? "Property Inspection");
+                var senderEmail = !string.IsNullOrWhiteSpace(fromEmail) ? fromEmail : _settings.FromEmail;
+                var senderName = !string.IsNullOrWhiteSpace(fromName) ? fromName : (_settings.FromName ?? "Property Inspection");
+
+                var fromAddress = new EmailAddress(senderEmail, senderName);
                 var toAddress = new EmailAddress(to);
                 
                 // Using the body for both html and plain text

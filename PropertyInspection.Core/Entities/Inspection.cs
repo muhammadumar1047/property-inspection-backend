@@ -32,6 +32,31 @@ namespace PropertyInspection.Core.Entities
         [Required]
         public TimeSpan InspectionTime { get; set; }
 
+        /// <summary>
+        /// Date when the inspection was completed.
+        /// </summary>
+        public DateTime? InspectionCompletedDate { get; set; }
+
+        /// <summary>
+        /// Date when the inspection report was closed.
+        /// </summary>
+        public DateTime? InspectionCloseDate { get; set; }
+
+        /// <summary>
+        /// URL of the signature image uploaded during close.
+        /// </summary>
+        public string? SignatureImageUrl { get; set; }
+
+        /// <summary>
+        /// Date when the signature was provided.
+        /// </summary>
+        public DateTime? SignatureDate { get; set; }
+
+        /// <summary>
+        /// S3 URL of the generated PDF report. Null if not yet generated.
+        /// </summary>
+        public string? PdfUrl { get; set; }
+
         // Navigation Properties
         [ForeignKey(nameof(PropertyId))]
         public virtual Property Property { get; set; } = null!;

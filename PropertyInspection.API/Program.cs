@@ -115,6 +115,13 @@ builder.Services.AddScoped<IQuickSuggestionService, QuickSuggestionService>();
 builder.Services.AddScoped<IEmailTemplateProcessor, EmailTemplateProcessor>();
 builder.Services.AddScoped<ISignatureService, SignatureService>();
 
+builder.Services.AddHttpClient("PdfGenerator", client =>
+{
+    var frontendBaseUrl = builder.Configuration["Frontend:BaseUrl"] ?? "http://localhost:3000";
+    client.BaseAddress = new Uri(frontendBaseUrl.TrimEnd('/'));
+    client.Timeout = TimeSpan.FromSeconds(60);
+});
+
 builder.Services.AddAutoMapper(cfg => {}, typeof(MappingProfile).Assembly);
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

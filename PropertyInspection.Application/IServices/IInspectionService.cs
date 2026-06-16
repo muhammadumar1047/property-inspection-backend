@@ -32,6 +32,9 @@ namespace PropertyInspection.Application.IServices
         // Get all inspections for a property
         Task<ServiceResponse<IReadOnlyList<InspectionResponse>>> GetAllByPropertyAsync(Guid propertyId, Guid? agencyId);
 
+        // Update the PdfUrl field for an inspection
+        Task<ServiceResponse<bool>> UpdatePdfUrlAsync(Guid inspectionId, Guid? agencyId, string pdfUrl);
+
         // Delete inspection by Id
         Task<ServiceResponse<bool>> DeleteAsync(Guid inspectionId, Guid? agencyId);
 
