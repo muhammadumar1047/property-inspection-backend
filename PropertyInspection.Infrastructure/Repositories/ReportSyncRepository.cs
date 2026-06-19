@@ -39,9 +39,13 @@ namespace PropertyInspection.Infrastructure.Repositories
                 }
                 else
                 {
-                    _dbSet.RemoveRange(existingReport);
-                    existingReport.ReportAreas = report.ReportAreas;
-                    existingReport.Notes = report.Notes;
+                    // Remove old report (cascade-deletes all children) and save immediately
+                    // to detach from the tracker so the PK is free for the new instance
+                    _dbSet.Remove(existingReport);
+                    await _context.SaveChangesAsync();
+
+                    // Now add the new report with fresh GUIDs – no PK conflict
+                    _dbSet.Add(report);
                 }
 
 
