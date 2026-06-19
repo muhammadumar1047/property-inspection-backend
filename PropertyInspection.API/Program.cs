@@ -65,6 +65,7 @@ builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler
 builder.Services.Configure<AwsSettings>(builder.Configuration.GetSection("AWS"));
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGridSettings"));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
 
 
 builder.Services.AddScoped<TenantContext>();
@@ -114,6 +115,7 @@ builder.Services.AddScoped<IEmailTemplateService, EmailTemplateService>();
 builder.Services.AddScoped<IQuickSuggestionService, QuickSuggestionService>();
 builder.Services.AddScoped<IEmailTemplateProcessor, EmailTemplateProcessor>();
 builder.Services.AddScoped<ISignatureService, SignatureService>();
+builder.Services.AddScoped<ISupportService, SupportService>();
 
 builder.Services.AddHttpClient("PdfGenerator", client =>
 {
